@@ -5,7 +5,7 @@
 :sectanchors:
 :idprefix:
 :sectnums:
-:source-highlighter: pygments
+:source-highlighter: rouge
 :toc: left
 :toc-title: 目次
 :toclevels: 3

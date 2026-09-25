@@ -1,4 +1,5 @@
 go/types.Type
+  *go/types.Alias
   *go/types.Array
   *go/types.Basic
   *go/types.Chan
@@ -10,3 +11,5 @@ go/types.Type
   *go/types.Slice
   *go/types.Struct
   *go/types.Tuple
+  *go/types.TypeParam
+  *go/types.Union

@@ -11,7 +11,8 @@ import (
 	"strings"
 
 	"go/types"
-	"golang.org/x/tools/go/loader"
+
+	"golang.org/x/tools/go/packages"
 )
 
 var (
@@ -43,20 +44,16 @@ func main() {
 	log.SetPrefix(progname + ": ")
 	log.SetFlags(0)
 
-	conf := loader.Config{}
-	conf.Import(path)
-
-	prog, err := conf.Load()
+	pkgs, err := packages.Load(&packages.Config{Mode: packages.NeedName | packages.NeedTypes}, path)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	pkg := prog.Package(path)
-	if pkg == nil {
+	if packages.PrintErrors(pkgs) > 0 || len(pkgs) != 1 {
 		log.Fatalf("could not load package %q", path)
 	}
 
-	pkgScope := pkg.Pkg.Scope()
+	pkg := pkgs[0].Types
+	pkgScope := pkg.Scope()
 
 	rootObj := pkgScope.Lookup(name)
 	if rootObj == nil {
@@ -65,7 +62,7 @@ func main() {
 
 	root := rootObj.Type()
 	if !types.IsInterface(root) {
-		log.Fatalf("not an interface type: %s", types.ObjectString(rootObj, types.RelativeTo(pkg.Pkg)))
+		log.Fatalf("not an interface type: %s", types.ObjectString(rootObj, types.RelativeTo(pkg)))
 	}
 
 	isChild := map[types.Type]map[types.Type]bool{root: {}}

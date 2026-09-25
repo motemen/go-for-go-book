@@ -1,8 +1,5 @@
 {
     "Versions": {
-        "Go": "1.7.4"
-    },
-    "Sources": {
-        "github.com/golang/gddo/gosrc": "26f13a8e63ecb3c404fef90d9e32157c604faec0"
+        "Go": "1.27.1"
     }
 }
