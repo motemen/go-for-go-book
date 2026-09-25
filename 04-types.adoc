@@ -233,6 +233,7 @@ goexample::typespkgname[output]
 
 NOTE: ファイル先頭の `package` 節で指定された名前はスコープに導入されないので、自パッケージの名前が `PkgName` の形で登場することはありません。
 
+ifdef::wip[]
 === types.TypeName
 
 WARNING: TBD
@@ -240,6 +241,7 @@ WARNING: TBD
 === types.Var
 
 WARNING: TBD
+endif::wip[]
 
 == types.Info
 
@@ -256,9 +258,11 @@ godoc::go/types.Info[]
 
 WARNING: WIP
 
+ifdef::wip[]
 == 型の情報
 
 === types.Type
+endif::wip[]
 
 [appendix]
 == types.Objectの階層

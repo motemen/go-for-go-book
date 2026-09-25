@@ -77,6 +77,7 @@ NOTE: ドキュメントに "`New takes ownership of the AST pkg and may edit or
 
 godoc::go/doc.AllDecls[]
 
+ifdef::wip[]
 === doc.Packageのレイアウト
 
 WARNING: WIP
@@ -88,3 +89,4 @@ WARNING: WIP
 WARNING: WIP
 
 * doc.Examples
+endif::wip[]
