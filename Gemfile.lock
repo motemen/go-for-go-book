@@ -114,6 +114,7 @@ DEPENDENCIES
   asciidoctor (~> 2.0)
   asciidoctor-epub3
   asciidoctor-pdf
+  logger
   rouge
 
 CHECKSUMS
@@ -167,6 +168,9 @@ CHECKSUMS
   strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
   treetop (1.6.18) sha256=a3043f32f1c652aa2abdf3a3848edb2d2f69897257af2675516ac61355c183da
   ttfunk (1.7.0) sha256=2370ba484b1891c70bdcafd3448cfd82a32dd794802d81d720a64c15d3ef2a96
+
+RUBY VERSION
+  ruby 4.0.7
 
 BUNDLED WITH
   4.0.9
