@@ -5,7 +5,7 @@
 `goimports` は以下のコマンドで入手できます：
 
 ....
-go get golang.org/x/tools/cmd/goimports
+go install golang.org/x/tools/cmd/goimports@latest
 ....
 
 == `import` の解決

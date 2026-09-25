@@ -3,7 +3,7 @@
 `stringer` は定数の文字列化のためのコードを自動生成するコマンドです。以下のようにして入手できます。
 
 ....
-$ go get golang.org/x/tools/cmd/stringer
+$ go install golang.org/x/tools/cmd/stringer@latest
 ....
 
 `go doc golang.org/x/tools/cmd/stringer` にある例を見るのが分かりやすいでしょう。以下のように定数を定義したソースコードを書いたとします。この定数を表示するため `fmt.Print(Uni)` などとしても、`2` と印字されるだけでどんな意味を持った値なのかの情報に欠けてしまっています。
