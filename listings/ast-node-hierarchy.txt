@@ -16,6 +16,7 @@ Node
     *FuncType
     *Ident
     *IndexExpr
+    *IndexListExpr
     *InterfaceType
     *KeyValueExpr
     *MapType
@@ -54,6 +55,7 @@ Node
     *TypeSwitchStmt
   *Comment
   *CommentGroup
+  *Directive
   *Field
   *FieldList
   *File
