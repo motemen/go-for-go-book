@@ -14,35 +14,49 @@
 :docinfo1:
 :linkcss:
 
+// 章の並びは改訂版アウトライン（v1）に合わせてある。
+// まだ本文のない章と節は ifdef::wip[] で囲み、公開版からは外している。
+// ビルド時に属性 wip を付けると（npm run build:wip）、これらも含めて出力する。
+
 include::00-intro.adoc[leveloffset=+1]
 include::01-ast.adoc[leveloffset=+1]
 include::02-comment-and-document.adoc[leveloffset=+1]
 
-== ソースコードの文字列化
+ifdef::wip[]
+== ソースコードの出力と書き換え
 
 WARNING: WIP
 
 - go/printer
 - go/format
+- golang.org/x/tools/go/ast/astutil
+endif::wip[]
 
 include::04-types.adoc[leveloffset=+1]
 
-== ビルド情報
+ifdef::wip[]
+== ビルド情報とパッケージの読み込み
 
 WARNING: WIP
 
 - go/build
+- go/build/constraint
+- go/version
+- golang.org/x/tools/go/packages
 
-== 高レベルのAPI
+== 静的解析ツールを作る
 
 WARNING: WIP
 
-- tools/go/loader
-
-include::07-reading-code.adoc[leveloffset=+1]
+- golang.org/x/tools/go/analysis
 
 == フロー解析
 
 WARNING: WIP
 
-- tools/go/ssa
+- golang.org/x/tools/go/cfg
+- golang.org/x/tools/go/ssa
+- golang.org/x/tools/go/callgraph
+endif::wip[]
+
+include::07-reading-code.adoc[leveloffset=+1]
