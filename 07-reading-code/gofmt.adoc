@@ -12,7 +12,7 @@ Goにおいて特徴的なコマンドで、ソースコードを標準的なス
 
 == ソースコードの印字
 
-gofmtのメインの処理はソースコードの整形と印字です。これを担当するのが `processFile`（gosource:src/cmd/gofmt/internal.go#L75[go1.6,processFile]）関数です。この関数は `go/source` パッケージの `format.Source` 関数とよく似ていて、違いは次以降の項で触れるソースコードの書き換えや標準入力の扱いなどです。
+gofmtのメインの処理はソースコードの整形と印字です。これを担当するのが `processFile`（gosource:src/cmd/gofmt/internal.go#L75[go1.6,processFile]）関数です。この関数は `go/format` パッケージの `format.Source` 関数とよく似ていて、違いは次以降の項で触れるソースコードの書き換えや標準入力の扱いなどです。
 
 入力をソースコードとして解析するのが `parse` 関数（gosource:src/cmd/gofmt/internal.go#L23[go1.6,parser]）で、内部では `parser.ParseFile` を利用しています。`fragmentOk` 引数が `true` である場合、宣言のリストや式などファイルとしては不完全なソースコードも解析できるよう、ソースコードの先頭に `package p;` を追加したり、ソースを `func _() { ... }` で囲んだりという処理がなされます。`gofmt` では標準入力からソースコードが与えられた場合にこのモードを使います。
 

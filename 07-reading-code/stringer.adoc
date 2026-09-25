@@ -14,7 +14,7 @@ goexample::stringersushi[file=sushi.go]
 
 godoc::fmt.Stringer[]
 
-見るからに単調な作業になので、プログラム的に生成することを考えますよね。そこで `stringer` の出番です。以上のような内容のソースコード `sushi.go` に対して `stringer -type Sushi sushi.go` を実行すると、次のソースコードが `pill_string.go` として生成されます。
+見るからに単調な作業なので、プログラム的に生成することを考えますよね。そこで `stringer` の出番です。以上のような内容のソースコード `sushi.go` に対して `stringer -type Sushi sushi.go` を実行すると、次のソースコードが `sushi_string.go` として生成されます。
 
 [[sushi_string.go]]
 goexample::stringersushi[file=sushi_string.go]
