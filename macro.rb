@@ -9,6 +9,11 @@ require 'net/https'
 CACHE_DIR    = Pathname.new('./.cache')
 EXAMPLES_DIR = Pathname.new('./examples')
 
+# bundler が vendor/bundle に gem を入れると、go コマンドがそれを Go の vendor
+# ディレクトリと誤認して失敗する。go run はモジュールモードの明示で回避できるが、
+# go doc は回避できないので、gem は vendor/bundle 以外に入れること。
+ENV['GOFLAGS'] ||= '-mod=mod'
+
 CONFIG     = JSON.parse(File.read('config.json'))
 GO_VERSION = CONFIG['Versions']['Go']
 
@@ -51,7 +56,8 @@ class GoExampleMacro < Asciidoctor::Extensions::BlockMacroProcessor
     style = attrs.delete(1)
 
     if style === 'output'
-      content, _ = run_cached('go-run', "go run #{file} 2>&1", file)
+      content, ok = run_cached('go-run', "go run #{file} 2>&1", file)
+      Asciidoctor::LoggerManager.logger.warn "goexample::#{target}[output] failed: #{content.lines.first&.chomp}" unless ok
       create_listing_block(
         parent,
         content,

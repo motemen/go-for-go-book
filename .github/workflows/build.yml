@@ -11,9 +11,9 @@ jobs:
     permissions:
       contents: write # gh-pages ブランチへのデプロイ用
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
@@ -37,37 +37,64 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
-          bundler-cache: true
+      # bundler-cache を使うと gem がリポジトリ直下の vendor/bundle に入り、
+      # go doc がそれを Go の vendor ディレクトリと誤認して失敗するので、
+      # gem はリポジトリの外（Ruby 本体の gem ディレクトリ）に入れる
+      - run: bundle install --jobs 4
 
       - name: HTML をビルド
-        run: bundle exec asciidoctor -r ./macro.rb index.adoc -D build
+        run: |
+          bundle exec asciidoctor -r ./macro.rb index.adoc -D build 2> build.log || { cat build.log; exit 1; }
+          cat build.log
+          # godoc / goexample マクロの失敗は警告として出るので、ここで検出して落とす。
+          # gddo 節の2件は R-02（節の削除）までの既知の警告として除外する。
+          if grep WARNING build.log | grep -v 'github.com/golang/gddo/'; then
+            echo "::error::マクロの実行に失敗した箇所があります（上の WARNING を参照）"
+            exit 1
+          fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: html
           path: build/
 
       - name: GitHub Pages（gh-pages ブランチ）にデプロイ
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone --depth 1 --branch gh-pages \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages
+          find pages -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R build/. pages/
+          cd pages
+          git add -A
+          if git diff --cached --quiet; then
+            echo "変更なし"
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -q -m "Deploy ${GITHUB_SHA}"
+          git push origin gh-pages
 
   # 文章の lint。本文の改稿中は指摘が残るので、失敗してもビルドとデプロイは止めない。
   lint:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
-          bundler-cache: true
-      - uses: actions/setup-node@v4
+      # bundler-cache を使うと gem がリポジトリ直下の vendor/bundle に入り、
+      # go doc がそれを Go の vendor ディレクトリと誤認して失敗するので、
+      # gem はリポジトリの外（Ruby 本体の gem ディレクトリ）に入れる
+      - run: bundle install --jobs 4
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
           cache: npm
