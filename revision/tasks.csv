@@ -2,7 +2,7 @@ ID,章・領域,対象ファイル,種別,タスク,背景・根拠（2026年9�
 G-01,全体方針,-,方針,対象バージョンを決める（例：Go 1.27 / golang.org/x/tools v0.5x）。本文中に「Go 1.xx以降」の注記ルールを定める,現行はGo 1.7.4基準（config.json）。最新はGo 1.27.1（2026-09）。go/types・go/astはこの間に大きく変化,P1,S,,未着手,
 G-02,全体方針,00-intro.adoc,方針,"本書の射程を再定義する。「go/で始まる標準パッケージ」から「標準go/* + golang.org/x/tools（packages, analysis, ssa）」へ広げるか判断",現代の静的解析ツールはほぼ全てgo/analysis・go/packages上に構築されており、標準パッケージだけでは実用的なツールが書けない,P1,S,,未着手,
 G-03,全体方針,-,方針,想定読者とゴールを決める（例：自作linterをgo vet/gopls/golangci-lintで動かせるまで）,章立て・サンプルの粒度がここで決まる,P1,S,G-02,未着手,
-G-04,全体方針,index.adoc,構成,新アウトラインを確定する（下の「構成」行の提案をたたき台に）,"WIP章が4つ残っており、現行の章番号（01,02,04,07）も欠番だらけ",P1,M,"G-02,G-03",未着手,outline.md に叩き台あり
+G-04,全体方針,index.adoc,構成,新アウトラインを確定する（revision/outline.md の案をたたき台に）,"WIP章が4つ残っており、現行の章番号（01,02,04,07）も欠番だらけ",P1,M,"G-02,G-03",未着手,outline.md に叩き台あり
 G-05,全体方針,全体,陳腐化,リンクを一括更新：golang.org→go.dev、godoc.org→pkg.go.dev、blog.golang.org→go.dev/blog、play.golang.org→go.dev/play,godoc.orgは2021年にpkg.go.devへ移行済み,P2,S,,未着手,macro.rb内のURLも対象（B-04）
 G-06,全体方針,全体,陳腐化,GOPATH前提の記述を全て洗い出し、モジュール前提に書き換える,"Go 1.16以降モジュールモードがデフォルト。GOPATH探索の説明（importer, go doc, goimports）はほぼ全て古い",P1,M,,未着手,grep GOPATH で7箇所程度
 G-07,全体方針,全体,陳腐化,`go get <cmd>` によるツール導入を `go install <pkg>@latest` に置換,go getでのバイナリインストールはGo 1.18で廃止,P2,S,,未着手,"goimports, stringer の章"
