@@ -50,8 +50,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version 667dbe5,</span>
-<span id="revdate">2026-09-25T17:19:58+09:00</span>
+<span id="revnumber">version 71155e3,</span>
+<span id="revdate">2026-09-25T18:32:25+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -164,7 +164,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 <ul class="sectlevel3">
 <li><a href="#引数の解決parseargs">7.1.1. 引数の解決（<code>parseArgs</code>）</a></li>
 <li><a href="#ソースコードの解析parsepackage">7.1.2. ソースコードの解析（<code>parsePackage</code>）</a></li>
-<li><a href="#ドキュメントの表示pacakge_packagedoc_など">7.1.3. ドキュメントの表示（<code>Pacakge.packageDoc</code> など）</a></li>
+<li><a href="#ドキュメントの表示package_packagedoc_など">7.1.3. ドキュメントの表示（<code>Package.packageDoc</code> など）</a></li>
 </ul>
 </li>
 <li><a href="#gofmt">7.2. gofmt</a>
@@ -294,7 +294,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </table>
 </div>
 <div class="paragraph">
-<p><code>go/parser.ParserExpr</code> はGoの式である文字列を構文解析し、式を表現する抽象構文木である <code>ast.Expr</code> を返します。</p>
+<p><code>go/parser.ParseExpr</code> はGoの式である文字列を構文解析し、式を表現する抽象構文木である <code>ast.Expr</code> を返します。</p>
 </div>
 <div class="listingblock">
 <div class="title">リスト 2. godoc: <a href="https://pkg.go.dev/go/parser#ParseExpr">go/parser.ParseExpr</a></div>
@@ -307,7 +307,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x2aed4f018040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x2aed4f018060)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x28dadee98040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x28dadee98060)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -375,7 +375,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 <div class="sect3">
 <h4 id="構文ノードのインタフェース"><a class="anchor" href="#構文ノードのインタフェース"></a>1.1.2. 構文ノードのインタフェース</h4>
 <div class="paragraph">
-<p><code>ast.ParseExpr</code> の返り値となっている <code>ast.Expr</code> はインタフェース型であり、先ほどの例で得られたのは具体的には <code>*ast.BinaryExpr</code> 構造体でした。これは二項演算に対応する構文ノードです。</p>
+<p><code>parser.ParseExpr</code> の返り値となっている <code>ast.Expr</code> はインタフェース型であり、先ほどの例で得られたのは具体的には <code>*ast.BinaryExpr</code> 構造体でした。これは二項演算に対応する構文ノードです。</p>
 </div>
 <div class="listingblock">
 <div class="title">リスト 5. godoc: <a href="https://pkg.go.dev/go/ast#BinaryExpr">go/ast.BinaryExpr</a></div>
@@ -703,7 +703,7 @@ int</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>定義を見れば分かるとおり、<code>ast.Node</code> インタフェース自身はその<a href="#ソースコード中の位置">ソースコード中の位置</a>を提供するだけであり、このままでは構文木に関する情報を得ることはできません。構文木を探索・操作するにはtype assertionやtype swtichによる具体的な型への変換が必要になります。</p>
+<p>定義を見れば分かるとおり、<code>ast.Node</code> インタフェース自身はその<a href="#ソースコード中の位置">ソースコード中の位置</a>を提供するだけであり、このままでは構文木に関する情報を得ることはできません。構文木を探索・操作するにはtype assertionやtype switchによる具体的な型への変換が必要になります。</p>
 </div>
 <div class="paragraph">
 <p>構文木のノードを大別するため、<code>ast.Node</code> を実装するサブインタフェースが定義されています：</p>
@@ -919,7 +919,7 @@ field in the AST (ast.FuncDecl.Recv) field is not restricted to one entry.</pre>
 <p><code>ast.Stmt</code> インタフェースはGoソースコードにおける <a href="https://golang.org/ref/spec#Statements">文</a> に対応する構文木のノードを表します。文はプログラムの実行を制御するもので、<code>go/ast</code> パッケージの実装では以下のように分類されています：</p>
 </div>
 <div class="ulist">
-<div class="title">ast.Declの分類</div>
+<div class="title">ast.Stmtの分類</div>
 <ul>
 <li>
 <p>宣言（<code>ast.DeclStmt</code>）</p>
@@ -1207,8 +1207,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x12b5037c100), (*ast.Field)(0x12b5037c140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x12b5037c100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x2aa29f384100), (*ast.Field)(0x2aa29f384140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x2aa29f384100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -1726,12 +1726,12 @@ func f() {
 <div class="listingblock">
 <div class="content">
 <pre>example.go:3:8   obj=0x0           kind=bad decl=&lt;nil&gt;
-example.go:6:8   obj=0x363bb61b4050  kind=var decl=*ast.AssignStmt
+example.go:6:8   obj=0x1f4f1aea0050  kind=var decl=*ast.AssignStmt
 example.go:6:13  obj=0x0           kind=bad decl=&lt;nil&gt;
-example.go:6:20  obj=0x363bb61b4050  kind=var decl=*ast.AssignStmt
-example.go:7:9   obj=0x363bb61b4050  kind=var decl=*ast.AssignStmt
-example.go:7:16  obj=0x363bb61b40a0  kind=var decl=*ast.Field
-example.go:7:36  obj=0x363bb61b40a0  kind=var decl=*ast.Field</pre>
+example.go:6:20  obj=0x1f4f1aea0050  kind=var decl=*ast.AssignStmt
+example.go:7:9   obj=0x1f4f1aea0050  kind=var decl=*ast.AssignStmt
+example.go:7:16  obj=0x1f4f1aea00a0  kind=var decl=*ast.Field
+example.go:7:36  obj=0x1f4f1aea00a0  kind=var decl=*ast.Field</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3409,7 +3409,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="ドキュメントの表示pacakge_packagedoc_など"><a class="anchor" href="#ドキュメントの表示pacakge_packagedoc_など"></a>7.1.3. ドキュメントの表示（<code>Pacakge.packageDoc</code> など）</h4>
+<h4 id="ドキュメントの表示package_packagedoc_など"><a class="anchor" href="#ドキュメントの表示package_packagedoc_など"></a>7.1.3. ドキュメントの表示（<code>Package.packageDoc</code> など）</h4>
 <div class="paragraph">
 <p><code>Package</code> 構造体の以下のメソッドがモードに応じて選ばれ、ユーザに表示される内容を生成します。</p>
 </div>
@@ -3451,7 +3451,7 @@ Usage of [go] doc:
 <div class="sect3">
 <h4 id="ソースコードの印字"><a class="anchor" href="#ソースコードの印字"></a>7.2.2. ソースコードの印字</h4>
 <div class="paragraph">
-<p>gofmtのメインの処理はソースコードの整形と印字です。これを担当するのが <code>processFile</code>（<a href="https://github.com/golang/go/blob/go1.6/src/cmd/gofmt/internal.go#L75"><code>internal.go:75</code></a>）関数です。この関数は <code>go/source</code> パッケージの <code>format.Source</code> 関数とよく似ていて、違いは次以降の項で触れるソースコードの書き換えや標準入力の扱いなどです。</p>
+<p>gofmtのメインの処理はソースコードの整形と印字です。これを担当するのが <code>processFile</code>（<a href="https://github.com/golang/go/blob/go1.6/src/cmd/gofmt/internal.go#L75"><code>internal.go:75</code></a>）関数です。この関数は <code>go/format</code> パッケージの <code>format.Source</code> 関数とよく似ていて、違いは次以降の項で触れるソースコードの書き換えや標準入力の扱いなどです。</p>
 </div>
 <div class="paragraph">
 <p>入力をソースコードとして解析するのが <code>parse</code> 関数（<a href="https://github.com/golang/go/blob/go1.6/src/cmd/gofmt/internal.go#L23"><code>internal.go:23</code></a>）で、内部では <code>parser.ParseFile</code> を利用しています。<code>fragmentOk</code> 引数が <code>true</code> である場合、宣言のリストや式などファイルとしては不完全なソースコードも解析できるよう、ソースコードの先頭に <code>package p;</code> を追加したり、ソースを <code>func _() { &#8230;&#8203; }</code> で囲んだりという処理がなされます。<code>gofmt</code> では標準入力からソースコードが与えられた場合にこのモードを使います。</p>
@@ -3587,7 +3587,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="paragraph">
-<p>見るからに単調な作業になので、プログラム的に生成することを考えますよね。そこで <code>stringer</code> の出番です。以上のような内容のソースコード <code>sushi.go</code> に対して <code>stringer -type Sushi sushi.go</code> を実行すると、次のソースコードが <code>pill_string.go</code> として生成されます。</p>
+<p>見るからに単調な作業なので、プログラム的に生成することを考えますよね。そこで <code>stringer</code> の出番です。以上のような内容のソースコード <code>sushi.go</code> に対して <code>stringer -type Sushi sushi.go</code> を実行すると、次のソースコードが <code>sushi_string.go</code> として生成されます。</p>
 </div>
 <div id="sushi_string.go" class="listingblock">
 <div class="title">リスト 75. sushi_string.go <span class="icon"><a class="image" href="https://play.golang.org/p/gfirJbaQVX" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
@@ -4089,8 +4089,8 @@ WIP
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 667dbe5<br>
-Last updated 2026-09-25 08:20:06 UTC
+Version 71155e3<br>
+Last updated 2026-09-25 09:32:35 UTC
 </div>
 </div>
 </body>
