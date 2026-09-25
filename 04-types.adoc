@@ -80,7 +80,7 @@ godoc::go/types.Error[]
 * ラベルが利用されていない・重複している
 * `:=` の左辺に新しい変数が登場していない
 * `init` 関数の本体が存在しない
-// 関数の本体については https://golang.org/ref/spec#Function_declarations
+// 関数の本体については https://go.dev/ref/spec#Function_declarations
 * C形式の `for` 文の後処理文で変数を定義しようとしている +
   …… `for i := 0; i < 10; i, j := i+1, i {` のような形。構文解析の時点では受けつけてしまいます
 // parseSimpleStmt。spec でも "PostStmt = SimpleStmt ." となってる
@@ -189,7 +189,7 @@ goexample::typesbuiltin[output]
 
 godoc::go/types.Const.Val[]
 
-https://golang.org/ref/spec#Constant_expressions[定数式]は型チェック時に評価され、値としてオブジェクトに保持されます（TODO: 定数畳み込み）。
+https://go.dev/ref/spec#Constant_expressions[定数式]は型チェック時に評価され、値としてオブジェクトに保持されます（TODO: 定数畳み込み）。
 
 goexample::typesconst[]
 
