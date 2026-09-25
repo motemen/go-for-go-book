@@ -7,7 +7,6 @@
     "test": "npm run lint",
     "watch:build": "gaze 'npm run build:html' *.adoc **/*.adoc examples/**/*.go macro.rb",
     "build:html": "bundle exec asciidoctor -r ./macro.rb index.adoc -D build",
-    "build:wip": "bundle exec asciidoctor -r ./macro.rb -a wip index.adoc -D build",
     "build:pdf": "bundle exec asciidoctor-pdf -r ./macro.rb index.adoc -D build",
     "build:epub": "bundle exec asciidoctor-epub3 -r ./macro.rb index.adoc -D build",
     "listings": "./scripts/gen-listings.sh"
