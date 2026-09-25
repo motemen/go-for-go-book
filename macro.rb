@@ -184,11 +184,71 @@ class TermMacro < Asciidoctor::Extensions::InlineMacroProcessor
   end
 end
 
+# API が導入されたバージョン、非推奨になったバージョンを示すバッジ
+#
+#   since:1.23[]              => Go 1.23〜
+#   since:x/tools@v0.50.0[]   => x/tools v0.50.0〜
+#   deprecated:1.22[]         => Go 1.22 で非推奨
+#
+# Go 1.0 からあるものには書かない。ドキュメント属性 since-min（既定値 1.1）より
+# 前の Go のバージョンの since はバッジにしない（:since-min: 1.18 などで調整する）。
+module VersionBadge
+  def self.label(target)
+    if (m = /\A(x\/\w+)@(v[\d.]+)\z/.match(target))
+      [m[1], m[2]]
+    elsif /\A1\.\d+(\.\d+)?\z/ === target
+      ['Go', target]
+    else
+      raise ArgumentError, "unknown version: #{target}"
+    end
+  end
+
+  def self.render(parent, kind, text)
+    if parent.document.basebackend?('html')
+      %(<span class="version-badge version-badge-#{kind}">#{text}</span>)
+    else
+      "（#{text}）"
+    end
+  end
+end
+
+class SinceMacro < Asciidoctor::Extensions::InlineMacroProcessor
+  use_dsl
+
+  named :since
+
+  def process(parent, target, attrs)
+    mod, ver = VersionBadge.label(target)
+    min = parent.document.attr('since-min', '1.1')
+    return '' if mod == 'Go' && Gem::Version.new(ver) < Gem::Version.new(min)
+    VersionBadge.render(parent, 'since', "#{mod} #{ver}〜")
+  rescue ArgumentError => e
+    Asciidoctor::LoggerManager.logger.warn "since:#{target}[]: #{e.message}"
+    ''
+  end
+end
+
+class DeprecatedMacro < Asciidoctor::Extensions::InlineMacroProcessor
+  use_dsl
+
+  named :deprecated
+
+  def process(parent, target, attrs)
+    mod, ver = VersionBadge.label(target)
+    VersionBadge.render(parent, 'deprecated', "#{mod} #{ver} で非推奨")
+  rescue ArgumentError => e
+    Asciidoctor::LoggerManager.logger.warn "deprecated:#{target}[]: #{e.message}"
+    ''
+  end
+end
+
 Asciidoctor::Extensions.register do
   block_macro  GoExampleMacro
   block_macro  GoDocMacro
   inline_macro GoSourceMacro
   inline_macro TermMacro
+  inline_macro SinceMacro
+  inline_macro DeprecatedMacro
   preprocessor do
     process do |document, reader|
       document.attributes['go_version'] = GO_VERSION
