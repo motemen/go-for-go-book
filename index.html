@@ -50,8 +50,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version 3dded77,</span>
-<span id="revdate">2026-09-25T19:49:24+09:00</span>
+<span id="revnumber">version 764e400,</span>
+<span id="revdate">2026-09-25T22:25:50+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -156,48 +156,48 @@ if (!/\blocalhost\b/.test(location.host)) {
 <li><a href="#types_typeの階層">Appendix C: types.Typeの階層</a></li>
 </ul>
 </li>
-<li><a href="#ビルド情報">5. ビルド情報</a></li>
-<li><a href="#高レベルのapi">6. 高レベルのAPI</a></li>
-<li><a href="#ソースコードを読む">7. ソースコードを読む</a>
+<li><a href="#ビルド情報とパッケージの読み込み">5. ビルド情報とパッケージの読み込み</a></li>
+<li><a href="#静的解析ツールを作る">6. 静的解析ツールを作る</a></li>
+<li><a href="#フロー解析">7. フロー解析</a></li>
+<li><a href="#ソースコードを読む">8. ソースコードを読む</a>
 <ul class="sectlevel2">
-<li><a href="#go_doc">7.1. go doc</a>
+<li><a href="#go_doc">8.1. go doc</a>
 <ul class="sectlevel3">
-<li><a href="#引数の解決parseargs">7.1.1. 引数の解決（<code>parseArgs</code>）</a></li>
-<li><a href="#ソースコードの解析parsepackage">7.1.2. ソースコードの解析（<code>parsePackage</code>）</a></li>
-<li><a href="#ドキュメントの表示package_packagedoc_など">7.1.3. ドキュメントの表示（<code>Package.packageDoc</code> など）</a></li>
+<li><a href="#引数の解決parseargs">8.1.1. 引数の解決（<code>parseArgs</code>）</a></li>
+<li><a href="#ソースコードの解析parsepackage">8.1.2. ソースコードの解析（<code>parsePackage</code>）</a></li>
+<li><a href="#ドキュメントの表示package_packagedoc_など">8.1.3. ドキュメントの表示（<code>Package.packageDoc</code> など）</a></li>
 </ul>
 </li>
-<li><a href="#gofmt">7.2. gofmt</a>
+<li><a href="#gofmt">8.2. gofmt</a>
 <ul class="sectlevel3">
-<li><a href="#gofmtの主なインタフェース">7.2.1. gofmtの主なインタフェース</a></li>
-<li><a href="#ソースコードの印字">7.2.2. ソースコードの印字</a></li>
-<li><a href="#gofmt_s_ソースをシンプルにする">7.2.3. <code>gofmt -s</code>: ソースをシンプルにする</a></li>
-<li><a href="#gofmt_r_ソースを書き換える">7.2.4. <code>gofmt -r</code>: ソースを書き換える</a></li>
+<li><a href="#gofmtの主なインタフェース">8.2.1. gofmtの主なインタフェース</a></li>
+<li><a href="#ソースコードの印字">8.2.2. ソースコードの印字</a></li>
+<li><a href="#gofmt_s_ソースをシンプルにする">8.2.3. <code>gofmt -s</code>: ソースをシンプルにする</a></li>
+<li><a href="#gofmt_r_ソースを書き換える">8.2.4. <code>gofmt -r</code>: ソースを書き換える</a></li>
 </ul>
 </li>
-<li><a href="#stringer">7.3. stringer</a>
+<li><a href="#stringer">8.3. stringer</a>
 <ul class="sectlevel3">
-<li><a href="#処理の流れ">7.3.1. 処理の流れ</a></li>
-<li><a href="#ソースのロード">7.3.2. ソースのロード</a></li>
-<li><a href="#型の発見generator_generate">7.3.3. 型の発見（<code>Generator.generate()</code>）</a></li>
-<li><a href="#文字列化処理の生成">7.3.4. 文字列化処理の生成</a></li>
+<li><a href="#処理の流れ">8.3.1. 処理の流れ</a></li>
+<li><a href="#ソースのロード">8.3.2. ソースのロード</a></li>
+<li><a href="#型の発見generator_generate">8.3.3. 型の発見（<code>Generator.generate()</code>）</a></li>
+<li><a href="#文字列化処理の生成">8.3.4. 文字列化処理の生成</a></li>
 </ul>
 </li>
-<li><a href="#goimports">7.4. goimports</a>
+<li><a href="#goimports">8.4. goimports</a>
 <ul class="sectlevel3">
-<li><a href="#import_の解決">7.4.1. <code>import</code> の解決</a></li>
+<li><a href="#import_の解決">8.4.1. <code>import</code> の解決</a></li>
 </ul>
 </li>
-<li><a href="#guru">7.5. guru</a></li>
-<li><a href="#gddo">7.6. gddo</a>
+<li><a href="#guru">8.5. guru</a></li>
+<li><a href="#gddo">8.6. gddo</a>
 <ul class="sectlevel3">
-<li><a href="#外部サービスへの対応">7.6.1. 外部サービスへの対応</a></li>
-<li><a href="#仮想的なソースコードディレクトリからドキュメントを生成する">7.6.2. 仮想的なソースコードディレクトリからドキュメントを生成する</a></li>
+<li><a href="#外部サービスへの対応">8.6.1. 外部サービスへの対応</a></li>
+<li><a href="#仮想的なソースコードディレクトリからドキュメントを生成する">8.6.2. 仮想的なソースコードディレクトリからドキュメントを生成する</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#フロー解析">8. フロー解析</a></li>
 </ul>
 </div>
 </div>
@@ -307,7 +307,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x8202cf98040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x8202cf98060)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x71f96272080), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x71f962720a0)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1207,8 +1207,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x1fdc09104100), (*ast.Field)(0x1fdc09104140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x1fdc09104100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x126c55318100), (*ast.Field)(0x126c55318140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x126c55318100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -1726,12 +1726,12 @@ func f() {
 <div class="listingblock">
 <div class="content">
 <pre>example.go:3:8   obj=0x0           kind=bad decl=&lt;nil&gt;
-example.go:6:8   obj=0x11f682bbe050  kind=var decl=*ast.AssignStmt
+example.go:6:8   obj=0x8e79fece050  kind=var decl=*ast.AssignStmt
 example.go:6:13  obj=0x0           kind=bad decl=&lt;nil&gt;
-example.go:6:20  obj=0x11f682bbe050  kind=var decl=*ast.AssignStmt
-example.go:7:9   obj=0x11f682bbe050  kind=var decl=*ast.AssignStmt
-example.go:7:16  obj=0x11f682bbe0a0  kind=var decl=*ast.Field
-example.go:7:36  obj=0x11f682bbe0a0  kind=var decl=*ast.Field</pre>
+example.go:6:20  obj=0x8e79fece050  kind=var decl=*ast.AssignStmt
+example.go:7:9   obj=0x8e79fece050  kind=var decl=*ast.AssignStmt
+example.go:7:16  obj=0x8e79fece0a0  kind=var decl=*ast.Field
+example.go:7:36  obj=0x8e79fece0a0  kind=var decl=*ast.Field</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2184,6 +2184,9 @@ WIP
 </li>
 <li>
 <p>go/format</p>
+</li>
+<li>
+<p>golang.org/x/tools/go/ast/astutil</p>
 </li>
 </ul>
 </div>
@@ -3221,7 +3224,7 @@ WIP
 </div>
 </div>
 <div class="sect1">
-<h2 id="ビルド情報"><a class="anchor" href="#ビルド情報"></a>5. ビルド情報</h2>
+<h2 id="ビルド情報とパッケージの読み込み"><a class="anchor" href="#ビルド情報とパッケージの読み込み"></a>5. ビルド情報とパッケージの読み込み</h2>
 <div class="sectionbody">
 <div class="admonitionblock warning">
 <table>
@@ -3240,12 +3243,21 @@ WIP
 <li>
 <p>go/build</p>
 </li>
+<li>
+<p>go/build/constraint</p>
+</li>
+<li>
+<p>go/version</p>
+</li>
+<li>
+<p>golang.org/x/tools/go/packages</p>
+</li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="高レベルのapi"><a class="anchor" href="#高レベルのapi"></a>6. 高レベルのAPI</h2>
+<h2 id="静的解析ツールを作る"><a class="anchor" href="#静的解析ツールを作る"></a>6. 静的解析ツールを作る</h2>
 <div class="sectionbody">
 <div class="admonitionblock warning">
 <table>
@@ -3262,14 +3274,44 @@ WIP
 <div class="ulist">
 <ul>
 <li>
-<p>tools/go/loader</p>
+<p>golang.org/x/tools/go/analysis</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="ソースコードを読む"><a class="anchor" href="#ソースコードを読む"></a>7. ソースコードを読む</h2>
+<h2 id="フロー解析"><a class="anchor" href="#フロー解析"></a>7. フロー解析</h2>
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+WIP
+</td>
+</tr>
+</table>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>golang.org/x/tools/go/cfg</p>
+</li>
+<li>
+<p>golang.org/x/tools/go/ssa</p>
+</li>
+<li>
+<p>golang.org/x/tools/go/callgraph</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ソースコードを読む"><a class="anchor" href="#ソースコードを読む"></a>8. ソースコードを読む</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>ここではGoプログラマに広く使われているツール類のソースコードを読むことで、実践においてどのようにAPIが利用されているかを見ていきます。ここで見るのはAPIの利用の仕方のベストプラクティスであるとともに、エンドユーザにどのようなインタフェースで機能を提供するべきかの実例でもあります。</p>
@@ -3287,7 +3329,7 @@ FIXME: 全体的に雑
 </table>
 </div>
 <div class="sect2">
-<h3 id="go_doc"><a class="anchor" href="#go_doc"></a>7.1. go doc</h3>
+<h3 id="go_doc"><a class="anchor" href="#go_doc"></a>8.1. go doc</h3>
 <div class="paragraph">
 <p>"go doc" はパッケージのAPIのドキュメントを閲覧する機能を提供するサブコマンドです。
 <code>go doc go/ast Node</code> のようにパッケージやシンボルを指定すると、そのドキュメントを表示します。</p>
@@ -3346,7 +3388,7 @@ type Node interface {
 <p>これから、それぞれの処理について詳しく見ていきます。</p>
 </div>
 <div class="sect3">
-<h4 id="引数の解決parseargs"><a class="anchor" href="#引数の解決parseargs"></a>7.1.1. 引数の解決（<code>parseArgs</code>）</h4>
+<h4 id="引数の解決parseargs"><a class="anchor" href="#引数の解決parseargs"></a>8.1.1. 引数の解決（<code>parseArgs</code>）</h4>
 <div class="paragraph">
 <p><code>go doc</code> サブコマンドに与えられるコマンドライン引数は、ユーザの意図を表した以下のような形の文字列のリストになっています。</p>
 </div>
@@ -3395,7 +3437,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="ソースコードの解析parsepackage"><a class="anchor" href="#ソースコードの解析parsepackage"></a>7.1.2. ソースコードの解析（<code>parsePackage</code>）</h4>
+<h4 id="ソースコードの解析parsepackage"><a class="anchor" href="#ソースコードの解析parsepackage"></a>8.1.2. ソースコードの解析（<code>parsePackage</code>）</h4>
 <div class="paragraph">
 <p>ドキュメント情報を得るためには、ソースコードを解析する必要があります。パッケージの情報が手元にあるので <code>parser.ParseDir</code> でディレクトリ内のファイルを一度に解析できますが、その際第3引数の <code>filter</code> を指定して <code>GoFiles</code> や <code>CgoFiles</code> に含まれないものを除去します。こうすることで、実行環境（<code>GOOS</code> や <code>GOARCH</code>）に合わせたソースコードのみを解析対象としています。</p>
 </div>
@@ -3409,7 +3451,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="ドキュメントの表示package_packagedoc_など"><a class="anchor" href="#ドキュメントの表示package_packagedoc_など"></a>7.1.3. ドキュメントの表示（<code>Package.packageDoc</code> など）</h4>
+<h4 id="ドキュメントの表示package_packagedoc_など"><a class="anchor" href="#ドキュメントの表示package_packagedoc_など"></a>8.1.3. ドキュメントの表示（<code>Package.packageDoc</code> など）</h4>
 <div class="paragraph">
 <p><code>Package</code> 構造体の以下のメソッドがモードに応じて選ばれ、ユーザに表示される内容を生成します。</p>
 </div>
@@ -3432,12 +3474,12 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect2">
-<h3 id="gofmt"><a class="anchor" href="#gofmt"></a>7.2. gofmt</h3>
+<h3 id="gofmt"><a class="anchor" href="#gofmt"></a>8.2. gofmt</h3>
 <div class="paragraph">
 <p>Goにおいて特徴的なコマンドで、ソースコードを標準的なスタイルにフォーマットします。ほとんどのGoプログラマが利用しているコマンドです（たぶん）。</p>
 </div>
 <div class="sect3">
-<h4 id="gofmtの主なインタフェース"><a class="anchor" href="#gofmtの主なインタフェース"></a>7.2.1. gofmtの主なインタフェース</h4>
+<h4 id="gofmtの主なインタフェース"><a class="anchor" href="#gofmtの主なインタフェース"></a>8.2.1. gofmtの主なインタフェース</h4>
 <div class="paragraph">
 <p>何もオプションを指定しない場合、gofmtは引数のファイルまたは標準入力をフォーマットして、標準出力に印字します。</p>
 </div>
@@ -3449,7 +3491,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="ソースコードの印字"><a class="anchor" href="#ソースコードの印字"></a>7.2.2. ソースコードの印字</h4>
+<h4 id="ソースコードの印字"><a class="anchor" href="#ソースコードの印字"></a>8.2.2. ソースコードの印字</h4>
 <div class="paragraph">
 <p>gofmtのメインの処理はソースコードの整形と印字です。これを担当するのが <code>processFile</code>（<a href="https://github.com/golang/go/blob/go1.6/src/cmd/gofmt/internal.go#L75"><code>internal.go:75</code></a>）関数です。この関数は <code>go/format</code> パッケージの <code>format.Source</code> 関数とよく似ていて、違いは次以降の項で触れるソースコードの書き換えや標準入力の扱いなどです。</p>
 </div>
@@ -3461,7 +3503,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="gofmt_s_ソースをシンプルにする"><a class="anchor" href="#gofmt_s_ソースをシンプルにする"></a>7.2.3. <code>gofmt -s</code>: ソースをシンプルにする</h4>
+<h4 id="gofmt_s_ソースをシンプルにする"><a class="anchor" href="#gofmt_s_ソースをシンプルにする"></a>8.2.3. <code>gofmt -s</code>: ソースをシンプルにする</h4>
 <div class="paragraph">
 <p>通常gofmtが行うのはソースコードの整形のみで、抽象構文木の構造が変わるような変更を行いませんが、<code>-s</code> や  <code>-r</code> を指定することでより積極的なフォーマットが可能です。</p>
 </div>
@@ -3518,7 +3560,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="gofmt_r_ソースを書き換える"><a class="anchor" href="#gofmt_r_ソースを書き換える"></a>7.2.4. <code>gofmt -r</code>: ソースを書き換える</h4>
+<h4 id="gofmt_r_ソースを書き換える"><a class="anchor" href="#gofmt_r_ソースを書き換える"></a>8.2.4. <code>gofmt -r</code>: ソースを書き換える</h4>
 <div class="paragraph">
 <p>さらに高度な機能として、引数に指定されたパターンに従ってソースコードを書き換えることもできます。以下のように <code>-&gt;</code> を2つのGoの式で挟んだ形式によってコードの書き換え規則を指定します。</p>
 </div>
@@ -3548,7 +3590,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect2">
-<h3 id="stringer"><a class="anchor" href="#stringer"></a>7.3. stringer</h3>
+<h3 id="stringer"><a class="anchor" href="#stringer"></a>8.3. stringer</h3>
 <div class="paragraph">
 <p><code>stringer</code> は定数の文字列化のためのコードを自動生成するコマンドです。以下のようにして入手できます。</p>
 </div>
@@ -3614,7 +3656,7 @@ Usage of [go] doc:
 <p>これで <code>Sushi</code> 型の値を文字列化したときの情報量が増しました。<code>fmt.Print(Uni)</code> は <code>Uni</code> を印字します。コードは複雑なことをしているように見えますが、基本的に値に対応する定数名を返しているだけです。</p>
 </div>
 <div class="sect3">
-<h4 id="処理の流れ"><a class="anchor" href="#処理の流れ"></a>7.3.1. 処理の流れ</h4>
+<h4 id="処理の流れ"><a class="anchor" href="#処理の流れ"></a>8.3.1. 処理の流れ</h4>
 <div class="paragraph">
 <p><code>stringer</code> は以下の流れでその仕事を行います。</p>
 </div>
@@ -3636,7 +3678,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="ソースのロード"><a class="anchor" href="#ソースのロード"></a>7.3.2. ソースのロード</h4>
+<h4 id="ソースのロード"><a class="anchor" href="#ソースのロード"></a>8.3.2. ソースのロード</h4>
 <div class="paragraph">
 <p>ソースコードとして引数には1つのディレクトリか複数のファイルが指定できますが、どちらの場合も <code>Generator.parsePackage</code>（<a href="https://github.com/golang/go/blob//x/tools/cmd/stringer/stringer.go#L231"><code>stringer.go:231</code></a>）を通ります。</p>
 </div>
@@ -3665,7 +3707,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="型の発見generator_generate"><a class="anchor" href="#型の発見generator_generate"></a>7.3.3. 型の発見（<code>Generator.generate()</code>）</h4>
+<h4 id="型の発見generator_generate"><a class="anchor" href="#型の発見generator_generate"></a>8.3.3. 型の発見（<code>Generator.generate()</code>）</h4>
 <div class="paragraph">
 <p>コマンドライン引数に指定された型名を、ソースコードから探し出します。</p>
 </div>
@@ -3687,7 +3729,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="文字列化処理の生成"><a class="anchor" href="#文字列化処理の生成"></a>7.3.4. 文字列化処理の生成</h4>
+<h4 id="文字列化処理の生成"><a class="anchor" href="#文字列化処理の生成"></a>8.3.4. 文字列化処理の生成</h4>
 <div class="paragraph">
 <p>最後に、発見された定数の値と名前をもとに、定数の文字列化を提供するコードを生成します。</p>
 </div>
@@ -3700,7 +3742,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect2">
-<h3 id="goimports"><a class="anchor" href="#goimports"></a>7.4. goimports</h3>
+<h3 id="goimports"><a class="anchor" href="#goimports"></a>8.4. goimports</h3>
 <div class="paragraph">
 <p><code>goimports</code> は与えられたソースコードを編集し、<code>import</code> 宣言の追加や削除忘れの面倒を見てくれるツールです。その際 <code>gofmt</code> 相当のことも行うので、<code>gofmt</code> 代わりに利用している人も多いのではないでしょうか。</p>
 </div>
@@ -3713,7 +3755,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="import_の解決"><a class="anchor" href="#import_の解決"></a>7.4.1. <code>import</code> の解決</h4>
+<h4 id="import_の解決"><a class="anchor" href="#import_の解決"></a>8.4.1. <code>import</code> の解決</h4>
 <div class="paragraph">
 <p><code>goimports</code> のメイン部分は <code>fixImports</code>（gosource:TODO）です。この関数は与えられた解析済みのソースコードから未解決の識別子を探しだし、必要なパッケージを <code>GOPATH</code> 以下から探しだして <code>import</code> 宣言を挿入します。</p>
 </div>
@@ -3841,11 +3883,11 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect2">
-<h3 id="guru"><a class="anchor" href="#guru"></a>7.5. guru</h3>
+<h3 id="guru"><a class="anchor" href="#guru"></a>8.5. guru</h3>
 
 </div>
 <div class="sect2">
-<h3 id="gddo"><a class="anchor" href="#gddo"></a>7.6. gddo</h3>
+<h3 id="gddo"><a class="anchor" href="#gddo"></a>8.6. gddo</h3>
 <div class="paragraph">
 <p><a href="https://godoc.org/">GoDoc.org</a>はサードパーティ製のものを含むGoライブラリのドキュメントを閲覧できるウェブサイトです。ここでは以下のようなURLでGitHubなどにホストされているGoライブラリにアクセスできます。</p>
 </div>
@@ -3896,7 +3938,7 @@ Usage of [go] doc:
 </ul>
 </div>
 <div class="sect3">
-<h4 id="外部サービスへの対応"><a class="anchor" href="#外部サービスへの対応"></a>7.6.1. 外部サービスへの対応</h4>
+<h4 id="外部サービスへの対応"><a class="anchor" href="#外部サービスへの対応"></a>8.6.1. 外部サービスへの対応</h4>
 <div class="paragraph">
 <p>GitHubやBitBucketなど有名どころでAPIも提供されているサービスに対しては、それぞれからソースコードを取得する処理が実装されています。</p>
 </div>
@@ -3966,7 +4008,7 @@ Usage of [go] doc:
 </div>
 </div>
 <div class="sect3">
-<h4 id="仮想的なソースコードディレクトリからドキュメントを生成する"><a class="anchor" href="#仮想的なソースコードディレクトリからドキュメントを生成する"></a>7.6.2. 仮想的なソースコードディレクトリからドキュメントを生成する</h4>
+<h4 id="仮想的なソースコードディレクトリからドキュメントを生成する"><a class="anchor" href="#仮想的なソースコードディレクトリからドキュメントを生成する"></a>8.6.2. 仮想的なソースコードディレクトリからドキュメントを生成する</h4>
 <div class="paragraph">
 <p>メソッド <code>gddo/doc.newPackage</code> が、仮想的なソースコードディレクトリである <code>gosrc.Directory</code> からドキュメントである <code>gddo/doc.Package</code> を生成します。<code>gosrc.Directory</code> はインポートパスや、ファイル名とそのデータを全て保持しています。</p>
 </div>
@@ -4062,35 +4104,11 @@ Usage of [go] doc:
 </div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="フロー解析"><a class="anchor" href="#フロー解析"></a>8. フロー解析</h2>
-<div class="sectionbody">
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-WIP
-</td>
-</tr>
-</table>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>tools/go/ssa</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 3dded77<br>
-Last updated 2026-09-25 10:49:34 UTC
+Version 764e400<br>
+Last updated 2026-09-25 13:26:00 UTC
 </div>
 </div>
 </body>
