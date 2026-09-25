@@ -36,7 +36,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: '4.0'
       # bundler-cache を使うと gem がリポジトリ直下の vendor/bundle に入り、
       # go doc がそれを Go の vendor ディレクトリと誤認して失敗するので、
       # gem はリポジトリの外（Ruby 本体の gem ディレクトリ）に入れる
@@ -89,7 +89,7 @@ jobs:
           go-version-file: go.mod
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: '4.0'
       # bundler-cache を使うと gem がリポジトリ直下の vendor/bundle に入り、
       # go doc がそれを Go の vendor ディレクトリと誤認して失敗するので、
       # gem はリポジトリの外（Ruby 本体の gem ディレクトリ）に入れる
