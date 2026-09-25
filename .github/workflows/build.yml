@@ -1,0 +1,75 @@
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # gh-pages ブランチへのデプロイ用
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: config.json の Go バージョンが go.mod と一致しているか確認
+        run: |
+          want="go$(go run ./scripts/ci/readconfig.go version Go < config.json)"
+          got="$(go env GOVERSION)"
+          echo "config.json: $want, toolchain: $got"
+          test "$want" = "$got"
+
+      - run: go vet ./...
+
+      - name: サンプルをすべて実行
+        run: ./scripts/run-examples.sh
+
+      - name: 付録の階層リストが最新か確認
+        run: |
+          ./scripts/gen-listings.sh
+          git diff --exit-code listings/
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: HTML をビルド
+        run: bundle exec asciidoctor -r ./macro.rb index.adoc -D build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: html
+          path: build/
+
+      - name: GitHub Pages（gh-pages ブランチ）にデプロイ
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+
+  # 文章の lint。本文の改稿中は指摘が残るので、失敗してもビルドとデプロイは止めない。
+  lint:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
