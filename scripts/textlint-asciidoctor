@@ -40,13 +40,14 @@ end.map do |node|
   elsif node.context == :list_item
     node.text
   else
-    node.render
+    node.convert
   end
 
   erase_tags.each do |tag|
     s.gsub!(%r( ?<#{tag}\b.*?>.*?</#{tag}> ?), ERASED_TEXT)
   end
   s.gsub!(/ *<.+?> */, '')
+  s.gsub!(/&#8203;|\u200B/, '') # asciidoctor が「…」の後などに入れるゼロ幅スペース
   s.strip!
 
   loc = node.source_location || node.parent.source_location

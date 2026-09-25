@@ -12,18 +12,23 @@ EXAMPLES_DIR = Pathname.new('./examples')
 CONFIG     = JSON.parse(File.read('config.json'))
 GO_VERSION = CONFIG['Versions']['Go']
 
+# コマンドを実行して出力を返す。成功した結果だけを .cache/ にキャッシュする。
+# 戻り値は [出力, 成功したか]。
 def run_cached(kind, command, file = nil)
   cache_file = Pathname.new(CACHE_DIR+"#{kind}-#{GO_VERSION}"+(file || command.gsub(/[^\w.]/, '_')))
   cache_mtime = cache_file.mtime rescue Time.new(0)
-  content = if !File.exist?(cache_file) || file && cache_mtime < file.mtime
-    STDERR.puts "macro: #{command}"
-    c = %x(#{command})
+  if File.exist?(cache_file) && !(file && cache_mtime < file.mtime)
+    return [cache_file.read(encoding: Encoding::UTF_8), true]
+  end
+
+  STDERR.puts "macro: #{command}"
+  c = %x(#{command}).force_encoding(Encoding::UTF_8)
+  ok = $?.success?
+  if ok
     cache_file.parent.mkpath
     cache_file.write(c)
-    c
-  else
-    cache_file.read
   end
+  [c, ok]
 end
 
 # ref: http://asciidoctor.org/docs/user-manual/#block-macro-processor-example
@@ -46,7 +51,7 @@ class GoExampleMacro < Asciidoctor::Extensions::BlockMacroProcessor
     style = attrs.delete(1)
 
     if style === 'output'
-      content = run_cached('go-run', "go run #{file} 2>&1", file)
+      content, _ = run_cached('go-run', "go run #{file} 2>&1", file)
       create_listing_block(
         parent,
         content,
@@ -103,7 +108,7 @@ class GoExampleMacro < Asciidoctor::Extensions::BlockMacroProcessor
         })
       )
       block.title = playground_key ? "#{filename} icon:play-circle-o[title=View in Go Playground, window=_blank, link=https://play.golang.org/p/#{playground_key}]" : filename
-      block.assign_caption
+      block.assign_caption nil
       block
     end
   end
@@ -125,7 +130,12 @@ class GoDocMacro < Asciidoctor::Extensions::BlockMacroProcessor
     if /^[a-z]/ === entry
       opts += ' -u'
     end
-    godoc = run_cached('go-doc', "go doc #{opts} #{target}")
+    godoc, ok = run_cached('go-doc', "go doc #{opts} #{target} 2>&1")
+    unless ok
+      Asciidoctor::LoggerManager.logger.warn "godoc::#{target}[] failed: #{godoc.lines.first&.chomp}"
+      return create_listing_block(parent, "// go doc #{target}: 取得できませんでした", attrs.merge({ 'title' => "godoc: #{target}" }))
+    end
+    godoc = godoc.sub(/\Apackage .*\n\n/, '') # 新しめの go doc は先頭にパッケージ行を出す
     godoc.sub!(/\n\n\n.*$/m, '')
     decl, *doc = godoc.split(/^ {4}/)
     decl_block = create_listing_block(
@@ -134,7 +144,7 @@ class GoDocMacro < Asciidoctor::Extensions::BlockMacroProcessor
       attrs.merge({
         'style'    => 'source',
         'language' => 'go',
-        'title'    => "godoc: http://godoc.org/pkg/#{pkg}##{entry}[#{target}]",
+        'title'    => "godoc: https://pkg.go.dev/#{pkg}##{entry}[#{target}]",
       })
     )
     # TODO doc

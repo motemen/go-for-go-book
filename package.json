@@ -7,23 +7,21 @@
     "test": "npm run lint",
     "watch:build": "gaze 'npm run build:html' *.adoc **/*.adoc examples/**/*.go macro.rb",
     "build:html": "bundle exec asciidoctor -r ./macro.rb index.adoc -D build",
-    "build:pdf": "bundle exec asciidoctor-pdf -r asciidoctor-pdf-cjk -r ./macro.rb index.adoc -D build",
-    "build:mobi": "bundle exec asciidoctor-epub3 -a ebook-format=kf8 -a ebook-compress=standard -r ./macro.rb index.adoc -D build",
-    "publish-html": "npm-run-all build:html publish-html:gh-pages",
-    "publish-html:gh-pages": "gh-pages --dist build --remote origin --add"
+    "build:pdf": "bundle exec asciidoctor-pdf -r ./macro.rb index.adoc -D build",
+    "build:epub": "bundle exec asciidoctor-epub3 -r ./macro.rb index.adoc -D build",
+    "listings": "./scripts/gen-listings.sh"
   },
   "author": "motemen (https://motemen.github.io/)",
   "private": true,
   "devDependencies": {
-    "browser-sync": "^2.11.1",
+    "browser-sync": "^3.0.4",
     "gaze-cli": "^0.2.0",
-    "gh-pages": "^0.11.0",
-    "npm-run-all": "^1.5.2",
-    "textlint": "^6.0.4",
-    "textlint-rule-no-doubled-conjunction": "^1.0.1",
-    "textlint-rule-no-doubled-conjunctive-particle-ga": "^1.0.2",
-    "textlint-rule-preset-japanese": "^1.0.3",
-    "textlint-rule-preset-jtf-style": "^2.1.2",
-    "textlint-rule-web-plus-db": "^1.1.4"
+    "npm-run-all2": "^9.0.3",
+    "textlint": "^15.8.0",
+    "textlint-rule-no-doubled-conjunction": "^3.0.1",
+    "textlint-rule-no-doubled-conjunctive-particle-ga": "^3.0.0",
+    "textlint-rule-preset-japanese": "^10.0.4",
+    "textlint-rule-preset-jtf-style": "^3.0.3",
+    "textlint-rule-web-plus-db": "^1.1.5"
   }
 }
