@@ -86,7 +86,7 @@ pkgs, err := parser.ParseDir(fs, pkg.Dir, include, parser.ParseComments)
 
 その後 `doc.New` して得られた `doc.Package` から `Package` 構造体を生成します。
 
-== ドキュメントの表示（`Pacakge.packageDoc` など）
+== ドキュメントの表示（`Package.packageDoc` など）
 
 `Package` 構造体の以下のメソッドがモードに応じて選ばれ、ユーザに表示される内容を生成します。
 

@@ -7,7 +7,7 @@ goexample::parseexpr[]
 
 NOTE: 簡単のため、サンプルコードではエラーを無視することがあります。
 
-`go/parser.ParserExpr` はGoの式である文字列を構文解析し、式を表現する抽象構文木である `ast.Expr` を返します。
+`go/parser.ParseExpr` はGoの式である文字列を構文解析し、式を表現する抽象構文木である `ast.Expr` を返します。
 
 godoc::go/parser.ParseExpr[]
 
@@ -34,7 +34,7 @@ godoc::go/ast.Print[]
 
 == 構文ノードのインタフェース
 
-`ast.ParseExpr` の返り値となっている `ast.Expr` はインタフェース型であり、先ほどの例で得られたのは具体的には `*ast.BinaryExpr` 構造体でした。これは二項演算に対応する構文ノードです。
+`parser.ParseExpr` の返り値となっている `ast.Expr` はインタフェース型であり、先ほどの例で得られたのは具体的には `*ast.BinaryExpr` 構造体でした。これは二項演算に対応する構文ノードです。
 
 godoc::go/ast.BinaryExpr[]
 
