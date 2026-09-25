@@ -1,0 +1,84 @@
+ID,章・領域,対象ファイル,種別,タスク,背景・根拠（2026年9月時点）,優先度,規模,依存,ステータス,メモ
+G-01,全体方針,-,方針,対象バージョンを決める（例：Go 1.27 / golang.org/x/tools v0.5x）。本文中に「Go 1.xx以降」の注記ルールを定める,現行はGo 1.7.4基準（config.json）。最新はGo 1.27.1（2026-09）。go/types・go/astはこの間に大きく変化,P1,S,,未着手,
+G-02,全体方針,00-intro.adoc,方針,"本書の射程を再定義する。「go/で始まる標準パッケージ」から「標準go/* + golang.org/x/tools（packages, analysis, ssa）」へ広げるか判断",現代の静的解析ツールはほぼ全てgo/analysis・go/packages上に構築されており、標準パッケージだけでは実用的なツールが書けない,P1,S,,未着手,
+G-03,全体方針,-,方針,想定読者とゴールを決める（例：自作linterをgo vet/gopls/golangci-lintで動かせるまで）,章立て・サンプルの粒度がここで決まる,P1,S,G-02,未着手,
+G-04,全体方針,index.adoc,構成,新アウトラインを確定する（下の「構成」行の提案をたたき台に）,"WIP章が4つ残っており、現行の章番号（01,02,04,07）も欠番だらけ",P1,M,"G-02,G-03",未着手,outline.md に叩き台あり
+G-05,全体方針,全体,陳腐化,リンクを一括更新：golang.org→go.dev、godoc.org→pkg.go.dev、blog.golang.org→go.dev/blog、play.golang.org→go.dev/play,godoc.orgは2021年にpkg.go.devへ移行済み,P2,S,,未着手,macro.rb内のURLも対象（B-04）
+G-06,全体方針,全体,陳腐化,GOPATH前提の記述を全て洗い出し、モジュール前提に書き換える,"Go 1.16以降モジュールモードがデフォルト。GOPATH探索の説明（importer, go doc, goimports）はほぼ全て古い",P1,M,,未着手,grep GOPATH で7箇所程度
+G-07,全体方針,全体,陳腐化,`go get <cmd>` によるツール導入を `go install <pkg>@latest` に置換,go getでのバイナリインストールはGo 1.18で廃止,P2,S,,未着手,"goimports, stringer の章"
+G-08,全体方針,全体,陳腐化,godoc出力中の `interface{}` を `any` に（godocマクロの再生成で自動的に変わるはず）,Go 1.18以降、標準ライブラリのシグネチャは any 表記,P3,S,B-01,未着手,
+G-09,全体方針,全体,未完,残っているTODO/WIP/FIXME/XXXコメントと、////で囲まれた旧稿ブロックを棚卸しして、書く・消すを判断,scope.adocに旧稿が丸ごと残存、TypeName/Var/Info等がTBD,P2,S,,未着手,
+G-10,全体方針,全体,方針,用語集を作る（オブジェクト、named language entity、識別子の解決、ノード、Cursor、ファクト 等）,scope.adoc に「訳語TODO」が2箇所。go/analysis導入で新用語が増える,P3,S,,未着手,
+I-01,はじめに,00-intro.adoc,陳腐化,「ジェネリクスや例外が（今のところ）存在しない」の記述を削除・書き換え,Go 1.18でジェネリクス導入、Go 1.27で型パラメータを持つメソッドも導入,P1,S,,未着手,
+I-02,はじめに,00-intro.adoc,欠落,「なぜGoのためのGoか」に現代の文脈を足す：go vet、gopls、go fix（1.26でモダナイザ化）、//go:fix inline、govulncheck など,Go 1.26でgo fixがanalysisフレームワーク上に再実装され、ツールによるコード補助の比重がさらに上がった,P2,S,G-02,未着手,
+I-03,はじめに,00-intro.adoc,欠落,本書で扱うパッケージの全体地図（token→parser→ast→types→packages→analysis→ssa）を図で示す,読者が各章の位置付けを掴めるように。現行版には全体像がない,P2,S,G-04,未着手,
+A-01,全体（誤記）,複数,誤り,既知の誤記を修正：ParserExpr→ParseExpr、ast.ParseExpr→parser.ParseExpr（expr.adoc）、type swtich（01-ast/types.adoc）、go/source→go/format（gofmt.adoc）、Pacakge（godoc.adoc）、「ast.Declの分類」は実際はStmtの一覧（01-ast/types.adoc）,読み通して見つかった本文の誤記,P1,S,,未着手,
+A-02,構文解析,01-ast/file.adoc,欠落,"構文木の走査手段を整理：ast.Walk / ast.Inspect / ast.Preorder（1.23, イテレータ）/ ast.PreorderStack（1.25）/ inspector（x/tools）",現行はInspectとWalkのみ。range-over-funcで書ける走査が標準に入った,P1,M,,未着手,
+A-03,構文解析,01-ast/file.adoc,欠落,ast.File の新しいフィールドを反映：FileStart/FileEnd（1.20）、GoVersion（1.21）,//go:build 由来のGoバージョンや正確なファイル範囲が取れるようになった,P2,S,,未着手,
+A-04,構文解析,01-ast/file.adoc,陳腐化,ast.File の解説から Scope/Unresolved の説明を外し、「非推奨」の注記に留める,ast.Object/Scope/File.Scope/File.Unresolved等はGo 1.22で非推奨,P1,S,A-10,未着手,
+A-05,構文解析,01-ast/types.adoc,欠落,ジェネリクスの構文ノードを追加：FuncType.TypeParams、TypeSpec.TypeParams、IndexListExpr、制約中の ~T（UnaryExpr）と A|B（BinaryExpr）,Go 1.18で追加されたノード/フィールドが全く扱われていない,P1,M,,未着手,
+A-06,構文解析,01-ast/types.adoc,欠落,Go 1.27のジェネリックメソッド（メソッド自身の型パラメータ）がASTでどう表現されるかを確認し記述,Go 1.27で言語仕様変更。FuncDecl側の表現を実物で確認する必要あり,P2,S,A-05,未着手,要検証
+A-07,構文解析,01-ast/types.adoc,未完,ast.SwitchStmt / TypeSwitchStmt / Field.Names の TODO を埋める,現状WARNING: TODOのまま,P2,S,,未着手,
+A-08,構文解析,01-ast/types.adoc,欠落,ast.Unparen（1.22）、BasicLit.ValueEnd（1.26）など小さな新APIをコラム的に紹介,実務で頻出する小技。ValueEndはBasicLit.End()の不正確さの修正,P3,S,,未着手,
+A-09,構文解析,01-ast/pos.adoc,欠落,位置情報の深掘り：token.File、PositionFor と //line ディレクティブ、Position(adjusted)の違い,cgoや生成コードの解析では//lineの扱いが重要になる。現行にTODOコメントあり,P2,M,,未着手,
+A-10,構文解析,01-ast/scope.adoc,構成,「スコープとオブジェクト」節を大幅縮小する。parser.SkipObjectResolution（推奨）を紹介し、構文レベルの名前解決は型解析章へ誘導するだけにする,ast.Object/Scope/Package/NewPackage/Importerは1.22で非推奨。ParseFileのドキュメントもSkipObjectResolutionを推奨,P1,M,,未着手,旧稿ブロックもここで削除
+A-11,構文解析,01-ast/scope.adoc,陳腐化,parser.ParseDir の節を削除または非推奨として扱い、go/packages に誘導,ParseDirはビルドタグを考慮しないため非推奨（go/packagesを使えとの記載）,P1,S,P-01,未着手,
+A-12,構文解析,01-ast/pos.adoc,陳腐化,go vet の出力例を現行形式に更新（列番号付き、メッセージ文言）,Go 1.7当時の出力,P3,S,,未着手,
+A-13,構文解析,listings/ast-node-hierarchy.txt,陳腐化,ast.Node階層の付録を再生成（IndexListExpr 等が欠落）,付録の自動生成スクリプト（printinterfacetree）がgo/loader依存で動かない,P2,S,B-06,未着手,
+A-14,構文解析,01-ast.adoc,構成,ファイル名 01-ast/types.adoc（中身は「構文ノードの実装」）をリネーム,04-types.adoc（型解析）と紛らわしい,P3,S,G-04,未着手,
+C-01,コメント・ドキュメント,02-comment-and-document.adoc,陳腐化,doc.New（ast.Package前提）を doc.NewFromFiles（1.14）に置き換える,ast.Packageが非推奨になり、doc.NewFromFilesが推奨経路,P1,S,,未着手,
+C-02,コメント・ドキュメント,02-comment-and-document.adoc,欠落,go/doc/comment（1.19）を扱う：見出し・リンク・リスト等のdocコメント構文とパーサ/プリンタ,Go 1.19でdocコメント構文が拡張され、gofmtも整形するようになった,P2,M,,未着手,
+C-03,コメント・ドキュメント,02-comment-and-document.adoc,欠落,"ディレクティブコメントを扱う：//go:generate, //go:build, //go:fix inline など。ast.ParseDirective（1.26）",Go 1.26でディレクティブ解析APIが標準に入った,P2,M,,未着手,
+C-04,コメント・ドキュメント,02-comment-and-document.adoc,欠落,生成コードの判定 ast.IsGenerated（1.21）と「Code generated ... DO NOT EDIT.」規約,linterが生成コードを除外する際の標準的な方法,P2,S,,未着手,stringer章と相互参照
+C-05,コメント・ドキュメント,02-comment-and-document.adoc,欠落,「Deprecated:」段落の規約と、それを利用するツール（staticcheck・gopls の非推奨警告）,ドキュメントコメントが機械可読な情報源として使われる好例,P3,S,,未着手,
+C-06,コメント・ドキュメント,02-comment-and-document.adoc,未完,doc.Packageのレイアウト節、Examples（doc.Examples）節の WIP を完成させる,現状WIP,P2,M,,未着手,
+C-07,コメント・ドキュメント,02-comment-and-document.adoc,陳腐化,「Godoc: documenting Go code」参照を go.dev/doc/comment（Go Doc Comments）に差し替え,公式の最新ドキュメントが別にある,P3,S,,未着手,
+W-01,ソースコードの文字列化・書き換え,index.adoc（WIP）,未完,go/printer・go/format の章を書く（format.Node / format.Source / printer.Config / CommentedNode）,章見出しだけのWIP,P1,L,,未着手,
+W-02,ソースコードの文字列化・書き換え,(新規),欠落,ASTを書き換えてから出力するときのコメント位置ずれ問題と、その回避策を説明,ASTにコメントが位置でしか結び付いていないため、書き換えるとコメントが迷子になるという定番の落とし穴,P2,M,W-01,未着手,
+W-03,ソースコードの文字列化・書き換え,(新規),欠落,astutil.Apply（Cursorによる置換/挿入/削除）と、テキスト編集（TextEdit）ベースの書き換えを比較,"現代のツール（go fix, gopls）はAST全体を再出力せず差分編集を返すのが主流",P2,M,W-01,未着手,SuggestedFix（N-04）へつなぐ
+T-01,型解析,04-types.adoc,欠落,"ジェネリクス対応：TypeParam, TypeParamList, Named.TypeArgs/Origin, Info.Instances, types.Instantiate, Signature の型パラメータ",Go 1.18以降の型解析で避けて通れない。現行は一切触れていない,P1,L,,未着手,
+T-02,型解析,04-types.adoc,欠落,types.Alias を扱う：1.22で追加、1.23でデフォルト有効、1.27でGODEBUGに関わらず常に生成,エイリアスをUnaliasせずに比較するとバグる、という現代的な定番の落とし穴,P1,M,T-01,未着手,
+T-03,型解析,04-types.adoc,陳腐化,importer.Default の説明を更新：GOPATHの.aファイルを読む、という説明は誤り。現代の推奨は go/packages 経由,Go 1.20以降GOROOTにビルド済み標準パッケージは同梱されない。go/typesのドキュメント自体がgo/packages.Loadの利用を勧めている,P1,M,P-01,未着手,
+T-04,型解析,04-types.adoc,未完,types.TypeName / types.Var の TBD 節を書く（Var.Kind 等の新API有無も確認）,現状TBD,P2,M,,未着手,
+T-05,型解析,04-types.adoc,未完,types.Info 節を完成：Types/Defs/Uses/Implicits/Selections/Scopes/Instances/FileVersions（1.22）,WIPのまま。解析ツールで最も使う構造体,P1,M,,未着手,
+T-06,型解析,04-types.adoc,未完,「型の情報」節（types.Type の各実装、Underlying、Identical、AssignableTo、Implements、MethodSet、LookupFieldOrMethod）を書く,見出しのみ,P1,L,,未着手,
+T-07,型解析,04-types.adoc,欠落,"go/types のイテレータAPI（1.24：Methods(), Fields() など）を使った書き方に揃える",Len/Atのペアに加えてイテレータを返すメソッドが追加された,P3,S,,未着手,
+T-08,型解析,04-types.adoc,欠落,types.Hasher（1.27）と typeutil.Map：型をキーにしたマップの作り方,型は==で比較できない（Identicalが必要）という重要なポイントを説明できる,P3,S,,未着手,要検証
+T-09,型解析,04-types.adoc,陳腐化,ソフトエラーの一覧を現行 go/types のソースで再確認,2016年頃のソースgrep結果が根拠。エラーコード化など内部実装も変わっている,P2,S,,未着手,
+T-10,型解析,04-types.adoc,欠落,Config.GoVersion と Info.FileVersions、go/version パッケージ（1.22）：ファイルごとの言語バージョンで型チェック結果が変わること,loop変数のセマンティクス変更（1.22）などバージョン依存の解析が必要になった,P2,M,,未着手,
+T-11,型解析,04-types.adoc,未完,冒頭WARNINGのTODO（名前解決・定数畳み込み・型推論）を書くか削るか判断,型推論はジェネリクス以降に重要度が上がった,P3,S,T-01,未着手,
+P-01,パッケージの読み込み,index.adoc（WIP: ビルド情報・高レベルのAPI）,構成,「ビルド情報（go/build）」「高レベルのAPI（go/loader）」の2つのWIP章を統合し、go/packages を主役にした章として書く,golang.org/x/tools/go/loader は非推奨でgo/packagesに置き換え済み。go/buildもモジュール時代には単独で使う場面が減った,P1,L,,未着手,
+P-02,パッケージの読み込み,(新規),欠落,"packages.Load の LoadMode（NeedName, NeedSyntax, NeedTypes, NeedTypesInfo...）、テストパッケージ、Overlay、ビルドタグ指定を解説",実用的なツールの入口,P1,M,P-01,未着手,
+P-03,パッケージの読み込み,(新規),欠落,go/packages が裏で go list -json を呼んでいる仕組み（ドライバ、GOPACKAGESDRIVER）,Bazel等の他ビルドシステムでも同じツールが動く理由の説明になる,P3,S,P-02,未着手,
+P-04,パッケージの読み込み,(新規),欠落,ビルド制約：//go:build と go/build/constraint（1.16）,+build 行は廃止方向、gofmtが自動変換する,P2,S,,未着手,
+P-05,パッケージの読み込み,(新規),欠落,エクスポートデータ（gcexportdata）と、ソースから型チェックする場合のトレードオフ,分析を速くするための基本知識。unitcheckerやgoplsの設計理解に必要,P3,M,P-02,未着手,
+N-01,静的解析ツールを作る（新章）,(新規),欠落,go/analysis の章を新設：Analyzer / Pass / Diagnostic、最小のlinterを書く,現代のGo静的解析の中心。現行版に全く存在しない（最優先の追加）,P1,L,G-02,未着手,
+N-02,静的解析ツールを作る（新章）,(新規),欠落,Requires/ResultOf による依存（inspectパス、buildssa等）,実際のアナライザはほぼ inspect.Analyzer に依存する,P1,M,N-01,未着手,
+N-03,静的解析ツールを作る（新章）,(新規),欠落,"inspector と Cursor（Parent, Enclosing, FindNode, edgeパッケージ）による効率的な走査",x/tools v0.3x以降で導入され、go fix/goplsのアナライザで多用されている新しいイディオム,P1,M,N-02,未着手,
+N-04,静的解析ツールを作る（新章）,(新規),欠落,SuggestedFix / TextEdit で自動修正を提供する,go fix・gopls のクイックフィックスはこの仕組み,P1,M,"N-01,W-03",未着手,
+N-05,静的解析ツールを作る（新章）,(新規),欠落,Facts（パッケージ間で情報を受け渡す）を解説（例：printf系ラッパーの検出）,分割解析の核心。printf アナライザが好例,P2,M,N-01,未着手,
+N-06,静的解析ツールを作る（新章）,(新規),欠落,analysistest によるテスト（// want コメント、.golden で修正結果を検証）,ツールを作るならテストはセット,P1,M,N-01,未着手,
+N-07,静的解析ツールを作る（新章）,(新規),欠落,ドライバ：singlechecker/multichecker、unitchecker と go vet -vettool、checker パッケージ,同じAnalyzerがコマンド・vet・IDEで動く、というアーキテクチャの説明,P1,M,N-01,未着手,
+N-08,静的解析ツールを作る（新章）,(新規),欠落,配布・統合：gopls への組み込み、golangci-lint（v2）のプラグイン、go fix（1.26〜）との関係,書いたlinterをどう使ってもらうか,P2,M,N-07,未着手,各ツールの現行手順は執筆時に要確認
+N-09,静的解析ツールを作る（新章）,(新規),欠落,//go:fix inline とソースレベルインライナ：ライブラリ作者がAPI移行を機械可読に配布する,Go 1.26で go fix に統合された新しいパラダイム,P2,M,N-04,未着手,
+F-01,フロー解析,index.adoc（WIP）,未完,"SSA章を書く：golang.org/x/tools/go/ssa, ssautil, buildssa パス",見出しのみのWIP,P2,L,P-02,未着手,
+F-02,フロー解析,(新規),欠落,制御フローグラフ（go/cfg、ctrlflowパス）を SSA の前段として紹介,SSAより軽量で、nilness・lostcancel等の実例がある,P3,M,,未着手,
+F-03,フロー解析,(新規),欠落,"コールグラフ（callgraph/static, cha, rta, vta）と govulncheck での使われ方",govulncheckが到達可能性判定に使っている、という実例で動機付けできる,P3,M,F-01,未着手,旧go/pointerの扱い（削除済みか）を要確認
+R-01,ソースコードを読む,07-reading-code.adoc,構成,事例章の構成を見直す：各事例を対応する解説章の直後に置く（例：stringer→型解析、gofmt→文字列化）か、最後にまとめるか決める,現行は「全体的に雑」とFIXMEがある。事例が解説と離れている,P2,S,G-04,未着手,
+R-02,ソースコードを読む,07-reading-code.adoc,陳腐化,gddo（godoc.org）節を削除。代替として pkgsite を扱うか判断,gddoはアーカイブ済み、godoc.orgはpkg.go.devにリダイレクト,P1,S,,未着手,
+R-03,ソースコードを読む,07-reading-code.adoc,陳腐化,guru節（空見出し）を削除。代替は gopls,guruは廃止されgoplsに置き換えられた,P1,S,,未着手,
+R-04,ソースコードを読む,07-reading-code/godoc.adoc,陳腐化,go doc の章を現行 cmd/doc の実装で読み直す（GOPATH探索→モジュール、ParseDir→現行の読み込み方法、go doc -http の有無）,GOPATH探索の説明が中心で現状と合わない,P2,M,,未着手,要検証
+R-05,ソースコードを読む,07-reading-code/gofmt.adoc,陳腐化,gofmt 節のソース参照を go1.6 から現行タグに更新し、処理の流れを再確認,リンク先の行番号がgo1.6基準,P2,M,,未着手,
+R-06,ソースコードを読む,07-reading-code/goimports.adoc,陳腐化,goimports 節を全面改稿：GOPATH索引・vendor の話を廃し、モジュールキャッシュを使う現行実装（x/tools/internal/imports）と gopls との共有を説明,vendor/GOPATH前提の説明は現状と全く異なる,P2,L,,未着手,事例として残すか自体を判断
+R-07,ソースコードを読む,07-reading-code/stringer.adoc,陳腐化,stringer 節を現行実装（go/packages 利用）で読み直す,現行実装はparser+types直叩きではない,P2,M,P-02,未着手,
+R-08,ソースコードを読む,07-reading-code/stringer.adoc,誤り,生成ファイル名 pill_string.go → sushi_string.go の誤記修正,本文の誤記,P1,S,,未着手,
+R-09,ソースコードを読む,(新規),欠落,新しい事例を追加候補から選ぶ：go fix のモダナイザ、go vet の printf/loopclosure、staticcheck、gopls のリファクタリング、govulncheck,現代の代表的ツールを読む章があると本書の価値が上がる,P2,L,N-01,未着手,2〜3本に絞る
+X-01,付録,04-types.adoc,陳腐化,"types.Object/types.Type 階層の付録を再生成（TypeParam, Union, Alias 等）",Go 1.7以降に追加された型が載っていない,P2,S,B-06,未着手,
+B-01,執筆基盤,"config.json, macro.rb",基盤,Goバージョンを更新し、godoc/goexampleマクロのキャッシュを作り直す,config.json は Go 1.7.4,P1,S,G-01,未着手,
+B-02,執筆基盤,circle.yml,基盤,"CI を CircleCI 1.0（circle.yml, Node 5）から GitHub Actions 等へ移行",CircleCI 1.0はサービス終了済み,P1,M,,未着手,
+B-03,執筆基盤,examples/,基盤,examples を go.mod 付きのモジュールにし、CIで全サンプルの go run / go vet を実行する,サンプルがGOPATH前提。x/tools依存のサンプルが増えるのでモジュール化が必須,P1,M,,未着手,
+B-04,執筆基盤,macro.rb,基盤,godoc マクロのリンク先を pkg.go.dev に、playground 共有先を go.dev/play に更新,現行は godoc.org/pkg/... へのリンク,P2,S,,未着手,play の共有APIの現行仕様は要確認
+B-05,執筆基盤,macro.rb,基盤,godoc マクロの「TODO doc」（ドキュメント本文の表示）を実装するか判断,現状は宣言部分のみ表示,P3,S,,未着手,
+B-06,執筆基盤,examples/printinterfacetree,基盤,printinterfacetree を go/loader から go/packages に移行し、付録生成を自動化,go/loader は非推奨,P2,S,,未着手,
+B-07,執筆基盤,"package.json, Gemfile",基盤,textlint・asciidoctor 周りの依存を更新。asciidoctor-pdf-cjk（旧）やmobi出力の要否を見直す,asciidoctor-pdfは単体でCJK対応済み。KindleはEPUB受付へ移行,P2,M,,未着手,
+B-08,執筆基盤,-,基盤,公開先（GitHub Pages）とデプロイ手順を再構築,CircleCIからのgh-pagesデプロイが止まっている,P2,S,B-02,未着手,
