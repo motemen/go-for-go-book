@@ -102,7 +102,7 @@ type (
 
 == ast.Stmt
 
-`ast.Stmt` インタフェースはGoソースコードにおける https://golang.org/ref/spec#Statements[文] に対応する構文木のノードを表します。文はプログラムの実行を制御するもので、`go/ast` パッケージの実装では以下のように分類されています：
+`ast.Stmt` インタフェースはGoソースコードにおける https://go.dev/ref/spec#Statements[文] に対応する構文木のノードを表します。文はプログラムの実行を制御するもので、`go/ast` パッケージの実装では以下のように分類されています：
 
 // ast.go 内の順番
 
@@ -134,7 +134,7 @@ type (
 ====
 TODO
 
-https://golang.org/ref/spec#ExprSwitchStmt
+https://go.dev/ref/spec#Expression_switches
 
 * `Init` は `switch *x := 1*; t {`
 * `Tag` は `switch x := 1; *t* {`
@@ -146,7 +146,7 @@ https://golang.org/ref/spec#ExprSwitchStmt
 ====
 TODO
 
-https://golang.org/ref/spec#TypeSwitchStmt
+https://go.dev/ref/spec#Type_switches
 
 * `Init`
 * `Assign`
@@ -155,7 +155,7 @@ https://golang.org/ref/spec#TypeSwitchStmt
 
 == ast.Expr
 
-`ast.Expr` インタフェースはおもにGoソースコードにおける https://golang.org/ref/spec#Expressions[式] および https://golang.org/ref/spec#Types[型] に対応する構文木のノードを表します。`go/ast` パッケージの実装では以下のように分類されています：
+`ast.Expr` インタフェースはおもにGoソースコードにおける https://go.dev/ref/spec#Expressions[式] および https://go.dev/ref/spec#Types[型] に対応する構文木のノードを表します。`go/ast` パッケージの実装では以下のように分類されています：
 
 NOTE: `ast.Ellipsis` や `ast.KeyValueExpr` のように、それ単体では式となり得ないノードも `ast.Expr` を実装していますが、このおかげでこれらを含むノードの実装が簡単になっているようです。
 
@@ -163,7 +163,7 @@ NOTE: `ast.Ellipsis` や `ast.KeyValueExpr` のように、それ単体では式
 * `...`（`ast.Ellipsis`）
 * 基本的な型のリテラル（`ast.BasicLit`）
 * 関数リテラル（`ast.FuncLit`）
-* https://golang.org/ref/spec#Composite_literals[複合リテラル]（`ast.CompositeLit`）
+* https://go.dev/ref/spec#Composite_literals[複合リテラル]（`ast.CompositeLit`）
 * 括弧（`ast.ParenExpr`）
 * セレクタまたは修飾された識別子（`x.y`）（`ast.SelectorExpr`）
 * 添字アクセス（`ast.IndexExpr`）

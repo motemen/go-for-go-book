@@ -38,7 +38,7 @@ godoc::go/ast.Comment[]
 
 == Goにおけるドキュメント
 
-Goではトップレベルの型や関数のすぐ直前のコメントがそのAPIのドキュメントである、と標準的に定められています（link:http://blog.golang.org/godoc-documenting-go-code[Godoc: documenting Go code]）。標準の `go doc` コマンドもこのルールに則ってドキュメントを表示します。
+Goではトップレベルの型や関数のすぐ直前のコメントがそのAPIのドキュメントである、と標準的に定められています（link:https://go.dev/blog/godoc[Godoc: documenting Go code]）。標準の `go doc` コマンドもこのルールに則ってドキュメントを表示します。
 
 .go doc go/parser.ParseFile
 ....

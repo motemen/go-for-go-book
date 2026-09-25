@@ -6,7 +6,7 @@
 
 まず、Goのソースコードファイルの構造を確認しておきましょう。
 
-https://golang.org/ref/spec#Source_file_organization[The Go Programming Language Specification - Source file organization] によれば、ひとつのファイルの中には
+https://go.dev/ref/spec#Source_file_organization[The Go Programming Language Specification - Source file organization] によれば、ひとつのファイルの中には
 
 1. パッケージ名
 2. `import` 節

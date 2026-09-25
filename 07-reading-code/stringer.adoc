@@ -48,7 +48,7 @@ godoc::go/types.Object[]
 
 コマンドライン引数に指定された型名を、ソースコードから探し出します。
 
-構文解析されたソースコードを走査し、`Generator.genDecl` で指定された名前の型を持つ定数の宣言グループを発見します。Goにおいて定数の宣言はグループ化でき、値や型を指定しない場合には、直前の値や型と同内容の宣言をしたものとみなされます（link:https://golang.org/ref/spec#Constant_declarations[Constant declarations]）。特に `iota` というキーワードを使って値を宣言することで、連続する値を持つ定数を宣言できます。
+構文解析されたソースコードを走査し、`Generator.genDecl` で指定された名前の型を持つ定数の宣言グループを発見します。Goにおいて定数の宣言はグループ化でき、値や型を指定しない場合には、直前の値や型と同内容の宣言をしたものとみなされます（link:https://go.dev/ref/spec#Constant_declarations[Constant declarations]）。特に `iota` というキーワードを使って値を宣言することで、連続する値を持つ定数を宣言できます。
 
 [source,go]
 ----

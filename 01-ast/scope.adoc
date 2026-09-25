@@ -25,7 +25,7 @@ WARNING: このように、`go/ast` のAPIで得られるスコープの情報�
 
 == スコープ
 
-Goのスコープはブロックにもとづいて作られます。ブレース（`{ ... }`）による明示的なブロックのほかにも、構文から作られるスコープがあります。link:https://golang.org/ref/spec#Declarations_and_scope[Declarations and scope - The Go Programming Language Specification] に述べられていますが、抄訳します：
+Goのスコープはブロックにもとづいて作られます。ブレース（`{ ... }`）による明示的なブロックのほかにも、構文から作られるスコープがあります。link:https://go.dev/ref/spec#Declarations_and_scope[Declarations and scope - The Go Programming Language Specification] に述べられていますが、抄訳します：
 
 * あらかじめ定義されている名前（`nil` や `int` など）はユニバースブロック（universe block）に属します。
 * トップレベルの定数、変数、関数（メソッドを除く）はパッケージブロック（package block）に属します。
@@ -129,7 +129,7 @@ godoc::go/parser.ParseDir[]
 
 この関数では `ast.NewPackage` で行われるような名前の解決は行われません。
 
-NOTE: `ParseDir` はひとつのディレクトリからひとつでなく複数のパッケージを返しうるAPIになっていますが、異常なことではありません。普通にコンパイルできるような構成においても、複数のパッケージがひとつのディレクトリに共在することはありえます（link:https://golang.org/cmd/go/#hdr-Test_packages[Test packages]）。
+NOTE: `ParseDir` はひとつのディレクトリからひとつでなく複数のパッケージを返しうるAPIになっていますが、異常なことではありません。普通にコンパイルできるような構成においても、複数のパッケージがひとつのディレクトリに共在することはありえます（link:https://pkg.go.dev/cmd/go#hdr-Test_packages[Test packages]）。
 
 ////////////////////////////////////////
 
@@ -191,7 +191,7 @@ goexample::astobject[output]
 
 == スコープ
 
-Go のスコープはブロックにもとづいて作られます。ブレース（`{...}`）による明示的なブロックの他に作られるブロックもあります。link:https://golang.org/ref/spec#Declarations_and_scope[Declarations and scope - The Go Programming Language Specification] に述べられていますが、抄訳します:
+Go のスコープはブロックにもとづいて作られます。ブレース（`{...}`）による明示的なブロックの他に作られるブロックもあります。link:https://go.dev/ref/spec#Declarations_and_scope[Declarations and scope - The Go Programming Language Specification] に述べられていますが、抄訳します:
 
 * あらかじめ定義されている識別子（`nil` など）の属するユニバースブロック（universe block）に属します。
 * トップレベルの定数、変数、関数（メソッドは除く）はパッケージブロック（package block）に属します。
