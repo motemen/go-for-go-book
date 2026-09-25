@@ -128,7 +128,6 @@ type (
 * `range` を含まない `for`（`ast.ForStmt`）
 * `range` を含む `for`（`ast.RangeStmt`）
 
-ifdef::wip[]
 === ast.SwitchStmt
 
 [WARNING]
@@ -153,7 +152,6 @@ https://go.dev/ref/spec#Type_switches
 * `Assign`
 
 ====
-endif::wip[]
 
 == ast.Expr
 

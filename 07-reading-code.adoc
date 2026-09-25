@@ -9,9 +9,7 @@ include::07-reading-code/gofmt.adoc[leveloffset=+1]
 include::07-reading-code/stringer.adoc[leveloffset=+1]
 include::07-reading-code/goimports.adoc[leveloffset=+1]
 
-ifdef::wip[]
 == guru
-endif::wip[]
 
 == gddo
 
