@@ -9,7 +9,8 @@
     "build:html": "bundle exec asciidoctor -r ./macro.rb index.adoc -D build",
     "build:pdf": "bundle exec asciidoctor-pdf -r ./macro.rb index.adoc -D build",
     "build:epub": "bundle exec asciidoctor-epub3 -r ./macro.rb index.adoc -D build",
-    "listings": "./scripts/gen-listings.sh"
+    "listings": "./scripts/gen-listings.sh",
+    "goapi": "./scripts/gen-goapi.sh"
   },
   "author": "motemen (https://motemen.github.io/)",
   "private": true,
