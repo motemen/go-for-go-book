@@ -50,8 +50,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version 764e400,</span>
-<span id="revdate">2026-09-25T22:25:50+09:00</span>
+<span id="revnumber">version 94f7242,</span>
+<span id="revdate">2026-09-27T14:24:47+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -307,7 +307,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x71f96272080), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x71f962720a0)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x188376398040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x188376398060)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1207,8 +1207,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x126c55318100), (*ast.Field)(0x126c55318140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x126c55318100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x91bdd05c100), (*ast.Field)(0x91bdd05c140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x91bdd05c100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -1631,7 +1631,7 @@ Valid position with file name:      example.go:2:3</pre>
 <p>構文解析によって得られたスコープは <code>ast.Scope</code> として表現されます：</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 32. godoc: <a href="https://pkg.go.dev/go/ast#Scope">go/ast.Scope</a></div>
+<div class="title">リスト 32. godoc: <a href="https://pkg.go.dev/go/ast#Scope">go/ast.Scope</a> <span class="version-badge version-badge-deprecated">Go 1.22 で非推奨</span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Scope</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">Outer</span>   <span class="o">*</span><span class="n">Scope</span>
@@ -1665,7 +1665,7 @@ Valid position with file name:      example.go:2:3</pre>
 <p><code>ast.Object</code> の <code>Decl</code> フィールドは、そのオブジェクトが宣言されたノードを表します。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 34. godoc: <a href="https://pkg.go.dev/go/ast#Object">go/ast.Object</a></div>
+<div class="title">リスト 34. godoc: <a href="https://pkg.go.dev/go/ast#Object">go/ast.Object</a> <span class="version-badge version-badge-deprecated">Go 1.22 で非推奨</span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Object</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">Kind</span> <span class="n">ObjKind</span>
@@ -1726,12 +1726,12 @@ func f() {
 <div class="listingblock">
 <div class="content">
 <pre>example.go:3:8   obj=0x0           kind=bad decl=&lt;nil&gt;
-example.go:6:8   obj=0x8e79fece050  kind=var decl=*ast.AssignStmt
+example.go:6:8   obj=0x38f365620050  kind=var decl=*ast.AssignStmt
 example.go:6:13  obj=0x0           kind=bad decl=&lt;nil&gt;
-example.go:6:20  obj=0x8e79fece050  kind=var decl=*ast.AssignStmt
-example.go:7:9   obj=0x8e79fece050  kind=var decl=*ast.AssignStmt
-example.go:7:16  obj=0x8e79fece0a0  kind=var decl=*ast.Field
-example.go:7:36  obj=0x8e79fece0a0  kind=var decl=*ast.Field</pre>
+example.go:6:20  obj=0x38f365620050  kind=var decl=*ast.AssignStmt
+example.go:7:9   obj=0x38f365620050  kind=var decl=*ast.AssignStmt
+example.go:7:16  obj=0x38f3656200a0  kind=var decl=*ast.Field
+example.go:7:36  obj=0x38f3656200a0  kind=var decl=*ast.Field</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1823,7 +1823,7 @@ example.go:7:36  obj=0x8e79fece0a0  kind=var decl=*ast.Field</pre>
 <div class="sect4">
 <h5 id="ast_package"><a class="anchor" href="#ast_package"></a>ast.Package</h5>
 <div class="listingblock">
-<div class="title">リスト 38. godoc: <a href="https://pkg.go.dev/go/ast#Package">go/ast.Package</a></div>
+<div class="title">リスト 38. godoc: <a href="https://pkg.go.dev/go/ast#Package">go/ast.Package</a> <span class="version-badge version-badge-deprecated">Go 1.22 で非推奨</span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Package</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">Name</span>    <span class="kt">string</span>             <span class="c">// package name</span>
@@ -1840,7 +1840,7 @@ example.go:7:36  obj=0x8e79fece0a0  kind=var decl=*ast.Field</pre>
 <p><code>ast.Package</code> は <code>ast.NewPackage</code> で生成されます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 39. godoc: <a href="https://pkg.go.dev/go/ast#NewPackage">go/ast.NewPackage</a></div>
+<div class="title">リスト 39. godoc: <a href="https://pkg.go.dev/go/ast#NewPackage">go/ast.NewPackage</a> <span class="version-badge version-badge-deprecated">Go 1.22 で非推奨</span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="n">NewPackage</span><span class="p">(</span><span class="n">fset</span> <span class="o">*</span><span class="n">token</span><span class="o">.</span><span class="n">FileSet</span><span class="p">,</span> <span class="n">files</span> <span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="n">File</span><span class="p">,</span> <span class="n">importer</span> <span class="n">Importer</span><span class="p">,</span> <span class="n">universe</span> <span class="o">*</span><span class="n">Scope</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">Package</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span></code></pre>
 </div>
@@ -1849,7 +1849,7 @@ example.go:7:36  obj=0x8e79fece0a0  kind=var decl=*ast.Field</pre>
 <p>第3引数の <code>importer ast.Importer</code> は、<code>import</code> されるパッケージパスから、それが導入するオブジェクトを（記録しつつ）返す関数を渡します。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 40. godoc: <a href="https://pkg.go.dev/go/ast#Importer">go/ast.Importer</a></div>
+<div class="title">リスト 40. godoc: <a href="https://pkg.go.dev/go/ast#Importer">go/ast.Importer</a> <span class="version-badge version-badge-deprecated">Go 1.22 で非推奨</span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Importer</span> <span class="k">func</span><span class="p">(</span><span class="n">imports</span> <span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="n">Object</span><span class="p">,</span> <span class="n">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="n">pkg</span> <span class="o">*</span><span class="n">Object</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span></code></pre>
 </div>
@@ -1883,7 +1883,7 @@ TODO: golang/gddo の例
 <p>Goでは、ひとつのパッケージに属するソースコードファイルは同じディレクトリ直下に配置されます。これらを一度に構文解析し、<code>ast.Package</code> を生成するAPIもあります。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 41. godoc: <a href="https://pkg.go.dev/go/parser#ParseDir">go/parser.ParseDir</a></div>
+<div class="title">リスト 41. godoc: <a href="https://pkg.go.dev/go/parser#ParseDir">go/parser.ParseDir</a> <span class="version-badge version-badge-deprecated">Go 1.25 で非推奨</span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="n">ParseDir</span><span class="p">(</span><span class="n">fset</span> <span class="o">*</span><span class="n">token</span><span class="o">.</span><span class="n">FileSet</span><span class="p">,</span> <span class="n">path</span> <span class="kt">string</span><span class="p">,</span> <span class="n">filter</span> <span class="k">func</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">FileInfo</span><span class="p">)</span> <span class="kt">bool</span><span class="p">,</span> <span class="n">mode</span> <span class="n">Mode</span><span class="p">)</span> <span class="p">(</span><span class="n">pkgs</span> <span class="k">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">Package</span><span class="p">,</span> <span class="n">first</span> <span class="kt">error</span><span class="p">)</span></code></pre>
 </div>
@@ -4107,8 +4107,8 @@ Usage of [go] doc:
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 764e400<br>
-Last updated 2026-09-25 13:26:00 UTC
+Version 94f7242<br>
+Last updated 2026-09-27 05:24:59 UTC
 </div>
 </div>
 </body>
