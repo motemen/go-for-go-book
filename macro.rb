@@ -150,11 +150,22 @@ class GoDocMacro < Asciidoctor::Extensions::BlockMacroProcessor
       attrs.merge({
         'style'    => 'source',
         'language' => 'go',
-        'title'    => "godoc: https://pkg.go.dev/#{pkg}##{entry}[#{target}]",
+        'title'    => "godoc: https://pkg.go.dev/#{pkg}##{entry}[#{target}]#{version_badges(target)}",
       })
     )
     # TODO doc
     decl_block
+  end
+
+  # 標準ライブラリのシンボルなら、導入・非推奨のバージョンのバッジを付けるための
+  # マクロを返す（見出しの中で since:/deprecated: マクロとして展開される）。
+  # パッケージができたときからあるシンボルには since を付けない（pkg.go.dev と同じ）。
+  def version_badges(target)
+    vs = VersionBadge.symbols[target] or return ''
+    badges = ''
+    badges += " since:#{target}[]" if vs[0] > VersionBadge.package_since(target)
+    badges += " deprecated:#{target}[]" if vs[1]
+    badges
   end
 end
 
@@ -186,21 +197,64 @@ end
 
 # API が導入されたバージョン、非推奨になったバージョンを示すバッジ
 #
-#   since:1.23[]              => Go 1.23〜
-#   since:x/tools@v0.50.0[]   => x/tools v0.50.0〜
-#   deprecated:1.22[]         => Go 1.22 で非推奨
+#   since:go/ast.Preorder[]        => Go 1.23〜（data/goapi.json から引く）
+#   since:1.18[]                   => Go 1.18〜（言語機能など、シンボルがないもの）
+#   since:x/tools@v0.50.0[]        => x/tools v0.50.0〜
+#   deprecated:go/ast.Object[]     => Go 1.22 で非推奨（data/goapi.json から引く）
+#   deprecated:1.22[]              => Go 1.22 で非推奨
 #
-# Go 1.0 からあるものには書かない。ドキュメント属性 since-min（既定値 1.1）より
+# godoc:: マクロは、標準ライブラリのシンボルについて同じバッジを自動で付ける。
+#
+# Go 1.0 からあるものには付けない。ドキュメント属性 since-min（既定値 1.1）より
 # 前の Go のバージョンの since はバッジにしない（:since-min: 1.18 などで調整する）。
+#
+# data/goapi.json は scripts/gen-goapi.sh で作る。Go のバージョンを上げたら作り直す。
+GOAPI_FILE = 'data/goapi.json'
+
 module VersionBadge
-  def self.label(target)
+  def self.logger
+    Asciidoctor::LoggerManager.logger
+  end
+
+  # シンボル名（go doc 形式）から [導入, 非推奨] のマイナーバージョンを引く表
+  def self.symbols
+    @symbols ||= begin
+      data = JSON.parse(File.read(GOAPI_FILE))
+      unless data['go'] == GO_VERSION
+        logger.warn "#{GOAPI_FILE} は Go #{data['go']} のものです。config.json の Go #{GO_VERSION} に合わせて scripts/gen-goapi.sh で作り直してください"
+      end
+      data['symbols']
+    end
+  end
+
+  # target を [ラベル, バージョン] にする。kind は :since か :deprecated
+  def self.label(target, kind)
     if (m = /\A(x\/\w+)@(v[\d.]+)\z/.match(target))
       [m[1], m[2]]
     elsif /\A1\.\d+(\.\d+)?\z/ === target
       ['Go', target]
+    elsif (vs = symbols[target])
+      minor = kind == :since ? vs[0] : vs[1]
+      raise ArgumentError, "#{target} は非推奨になっていません" unless minor
+      ['Go', "1.#{minor}"]
     else
-      raise ArgumentError, "unknown version: #{target}"
+      raise ArgumentError, "#{target} は #{GOAPI_FILE} にありません（バージョンか標準ライブラリのシンボル名を書いてください）"
     end
+  end
+
+  # シンボルを含むパッケージが導入されたマイナーバージョン
+  def self.package_since(target)
+    pkg = target.sub(%r{\.[^/]*\z}, '')
+    @package_since ||= symbols.each_with_object(Hash.new(Float::INFINITY)) do |(key, vs), h|
+      k = key.sub(%r{\.[^/]*\z}, '')
+      h[k] = vs[0] if vs[0] < h[k]
+    end
+    @package_since[pkg]
+  end
+
+  def self.hidden?(parent, mod, ver)
+    min = parent.document.attr('since-min', '1.1')
+    mod == 'Go' && Gem::Version.new(ver) < Gem::Version.new(min)
   end
 
   def self.render(parent, kind, text)
@@ -218,12 +272,11 @@ class SinceMacro < Asciidoctor::Extensions::InlineMacroProcessor
   named :since
 
   def process(parent, target, attrs)
-    mod, ver = VersionBadge.label(target)
-    min = parent.document.attr('since-min', '1.1')
-    return '' if mod == 'Go' && Gem::Version.new(ver) < Gem::Version.new(min)
+    mod, ver = VersionBadge.label(target, :since)
+    return '' if VersionBadge.hidden?(parent, mod, ver)
     VersionBadge.render(parent, 'since', "#{mod} #{ver}〜")
   rescue ArgumentError => e
-    Asciidoctor::LoggerManager.logger.warn "since:#{target}[]: #{e.message}"
+    VersionBadge.logger.warn "since:#{target}[]: #{e.message}"
     ''
   end
 end
@@ -234,10 +287,10 @@ class DeprecatedMacro < Asciidoctor::Extensions::InlineMacroProcessor
   named :deprecated
 
   def process(parent, target, attrs)
-    mod, ver = VersionBadge.label(target)
+    mod, ver = VersionBadge.label(target, :deprecated)
     VersionBadge.render(parent, 'deprecated', "#{mod} #{ver} で非推奨")
   rescue ArgumentError => e
-    Asciidoctor::LoggerManager.logger.warn "deprecated:#{target}[]: #{e.message}"
+    VersionBadge.logger.warn "deprecated:#{target}[]: #{e.message}"
     ''
   end
 end
