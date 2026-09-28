@@ -30,7 +30,7 @@ go install golang.org/x/tools/cmd/goimports@latest
 
 構文木の探索は `ast.Walk` を使って実装されています。`goimports` 中では、 `ast.SelectorExpr` と `ast.ImportSpec` の2種類の構文要素が興味ある対象です。
 
-`ast.SelectorExpr` は `expr.sel` の形の式で、term::セレクタ[selector]と呼ばれています。`expr` には任意の式が入り得ますが、ここではインポートされたパッケージの呼び出しを発見したいだけなので `expr` が識別子（`ast.Ident`）であるかのチェックを行っています。こうして発見されたパッケージ名へのセレクタのうち、<<オブジェクト>>が未解決のものを収集します。
+`ast.SelectorExpr` は `expr.sel` の形の式で、term::セレクタ[selector]と呼ばれています。`expr` には任意の式が入り得ますが、ここではインポートされたパッケージの呼び出しを発見したいだけなので `expr` が識別子（`ast.Ident`）であるかのチェックを行っています。こうして発見されたパッケージ名へのセレクタのうち、<<ast-object-deprecation,オブジェクト>>が未解決のものを収集します。
 
 `ast.ImportSpec` は `import` 宣言ひとつ分に対応します。例えば以下のような `import` 宣言には4つの `ImportSpec` が含まれています。
 

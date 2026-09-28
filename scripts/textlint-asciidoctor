@@ -46,6 +46,8 @@ end.map do |node|
   erase_tags.each do |tag|
     s.gsub!(%r( ?<#{tag}\b.*?>.*?</#{tag}> ?), ERASED_TEXT)
   end
+  # 解決できなかった文書内リンクは <a href="#X">[X]</a> になるので、括弧を外す
+  s.gsub!(%r(<a href="#[^"]*">\[([^\]<]*)\]</a>), '\\1')
   s.gsub!(/ *<.+?> */, '')
   s.gsub!(/&#8203;|\u200B/, '') # asciidoctor が「…」の後などに入れるゼロ幅スペース
   s.strip!

@@ -67,7 +67,7 @@ Goパッケージの（ソースコードから生成される）ドキュメン
 
 godoc::go/doc.Package[]
 
-`doc.Package` は `doc.New` 関数によって `ast.Package`（<<パッケージ>>）から生成されます。
+`doc.Package` は `doc.New` 関数によって `ast.Package`（-> <<ast-object-deprecation>>）から生成されます。
 
 godoc::go/doc.New[]
 
