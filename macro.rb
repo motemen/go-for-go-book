@@ -5,6 +5,8 @@ require 'json'
 require 'digest'
 require 'uri'
 require 'net/https'
+require 'open3'
+require 'shellwords'
 
 CACHE_DIR    = Pathname.new('./.cache')
 EXAMPLES_DIR = Pathname.new('./examples')
@@ -36,6 +38,28 @@ def run_cached(kind, command, file = nil)
   [c, ok]
 end
 
+# サンプルのディレクトリ dir でコマンドを実行して出力を返す。終了コードが status の
+# ときだけ成功とみなし、.cache/ にキャッシュする。dir 以下のファイルが更新されたら
+# 実行し直す。出力の中の dir の絶対パスは取り除く。戻り値は [出力, 成功したか]。
+def run_example(kind, dir, command, status: 0)
+  key = Digest::SHA1.hexdigest("#{dir}\0#{command}\0#{status}")
+  cache_file = CACHE_DIR+"#{kind}-#{GO_VERSION}"+"#{dir.basename}-#{key[0, 12]}"
+  newest = Dir.glob("#{dir}/**/*", File::FNM_DOTMATCH).select { |f| File.file?(f) }.map { |f| File.mtime(f) }.max
+  if cache_file.exist? && newest && cache_file.mtime >= newest
+    return [cache_file.read(encoding: Encoding::UTF_8), true]
+  end
+
+  STDERR.puts "macro: (cd #{dir} && #{command})"
+  out, st = Open3.capture2e(command, chdir: dir.to_s)
+  out = out.force_encoding(Encoding::UTF_8).gsub("#{File.expand_path(dir)}/", '')
+  ok = st.exitstatus == status
+  if ok
+    cache_file.parent.mkpath
+    cache_file.write(out)
+  end
+  [out, ok]
+end
+
 # ref: http://asciidoctor.org/docs/user-manual/#block-macro-processor-example
 
 # Expands to an example code under ./examples or its output
@@ -45,6 +69,19 @@ end
 #   goexample::parsefile[output]
 #
 # Runs examples/parseexpr/parseexpr.go
+#
+# 引数を与えて実行する、テストを実行する（静的解析ツールのサンプルなど）：
+#
+#   goexample::errorfmt[file=testdata/src/a/a.go]         ソース以外のファイルも表示できる
+#   goexample::errorfmt[output, args="./testdata/src/a", status=3]
+#   goexample::errorfmt[test]                             go test -v の出力
+#   goexample::errorfmt[test, args="-run TestAnalyzer"]
+#   goexample::errorfmt[test, status=1]                   失敗するテストの出力を見せる
+#
+# コマンドはサンプルのディレクトリで実行する。output ではビルドしたバイナリを直接
+# 実行するので、status に終了コードを書ける（go/analysis のツールは、診断を報告すると
+# 3 で終わる）。出力の中のサンプルのディレクトリの絶対パスは取り除き、go test の
+# 所要時間は消す。
 class GoExampleMacro < Asciidoctor::Extensions::BlockMacroProcessor
   use_dsl
 
@@ -52,10 +89,11 @@ class GoExampleMacro < Asciidoctor::Extensions::BlockMacroProcessor
 
   def process(parent, target, attrs)
     filename = attrs['file'] || "#{target}.go"
-    file = EXAMPLES_DIR + "#{target}/#{filename}"
+    dir = EXAMPLES_DIR + target
+    file = dir + filename
     style = attrs.delete(1)
 
-    if style === 'output'
+    if style === 'output' && !attrs['args'] && !attrs['status']
       content, ok = run_cached('go-run', "go run #{file} 2>&1", file)
       Asciidoctor::LoggerManager.logger.warn "goexample::#{target}[output] failed: #{content.lines.first&.chomp}" unless ok
       create_listing_block(
@@ -63,6 +101,17 @@ class GoExampleMacro < Asciidoctor::Extensions::BlockMacroProcessor
         content,
         attrs
       )
+    elsif style === 'output'
+      bin = File.expand_path(CACHE_DIR + "bin-#{GO_VERSION}" + target)
+      command = "go build -o #{bin.shellescape} . && #{bin.shellescape} #{attrs['args']}"
+      content, ok = run_example('go-run-args', dir, command, status: attrs.fetch('status', 0).to_i)
+      Asciidoctor::LoggerManager.logger.warn "goexample::#{target}[output, args=#{attrs['args']}] failed: #{content.lines.first&.chomp}" unless ok
+      create_listing_block(parent, content, attrs)
+    elsif style === 'test'
+      content, ok = run_example('go-test', dir, "go test -count=1 -v #{attrs['args']} .", status: attrs.fetch('status', 0).to_i)
+      Asciidoctor::LoggerManager.logger.warn "goexample::#{target}[test] failed: #{content.lines.first&.chomp}" unless ok
+      content = content.gsub(/ \(\d+\.\d+s\)$/, '').gsub(/\t\d+\.\d+s$/, '')
+      create_listing_block(parent, content, attrs)
     else
       source = IO.read(file)
       digest = Digest::SHA1.hexdigest(source)
@@ -72,8 +121,10 @@ class GoExampleMacro < Asciidoctor::Extensions::BlockMacroProcessor
 
       playground_key = playground_keys[digest]
       unless playground_key
-        # quick check if the example contains non-standard package or not
-        if /\./ === %x(go list -f {{.Imports}} #{file}) # we know that file starts with ./
+        # Playground で動かせるのは、標準パッケージだけを使う main パッケージだけ
+        # （testdata やテストのファイルは共有しない）
+        name, imports = %x(go list -f '{{.Name}} {{.Imports}}' #{file}).split(' ', 2) # we know that file starts with ./
+        if name != 'main' || /\./ === imports || %r{(\A|/)testdata/|_test\.go\z} === filename
           # nop
         else
           STDERR.print "macro: sharing #{file} to playground ... "

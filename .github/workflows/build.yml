@@ -26,7 +26,7 @@ jobs:
 
       - run: go vet ./...
 
-      - name: サンプルをすべて実行
+      - name: サンプルをすべて実行し、テストのあるサンプルはテストする
         run: ./scripts/run-examples.sh
 
       - name: 付録の階層リストが最新か確認
