@@ -251,9 +251,11 @@ WARNING: TODO Names のふるまい方; nil と複数
 
 型や関数を宣言するときには、その制約とともに型パラメータを指定します。この表記は関数のパラメータや構造体のフィールドと同型なので、同じく `ast.FieldList` で表されます。`ast.TypeSpec`、`ast.FuncType` の持つ `TypeParams` フィールドがこれにあたります。
 
+godoc::go/ast.TypeSpec[]
+
 godoc::go/ast.FuncType[]
 
-godoc::go/ast.TypeSpec[]
+Go 1.27で追加されたジェネリックなメソッド（<https://go.dev/doc/go1.27#language>）の型パラメータは、`FuncType.TypeParams` で表現されます。
 
 `ast.FieldList` は複数の `ast.Field` を持ち、ここでは `ast.Field.Names` が型パラメータの名前を、`ast.Field.Type` が型パラメータの制約を表します。型の制約には `~int | ~float64` のように型の集合を指定できますが、これは `ast.UnaryExpr`（`~`）や `ast.BinaryExpr`（`|`）として表されます。
 
@@ -289,7 +291,7 @@ include::../listings/typeparams-index.ast.txt[]
 
 ****
 
-=== インタフェースの制約：ast.FieldList
+=== インタフェースの制約：`ast.FieldList`
 
 型の制約を含むインタフェース（link:https://go.dev/ref/spec#General_interfaces[General interfaces]）には、メソッドのほかに `int` や `~int | ~float64` といった型の集合を書けます。
 

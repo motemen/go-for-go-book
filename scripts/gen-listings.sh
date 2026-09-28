@@ -9,4 +9,4 @@ go run ./examples/printinterfacetree go/types Type > listings/types-type-hierarc
 
 go run ./examples/printastcompact -source -omit Obj,Body,Params,Results listings/typeparams-decl.go.txt > listings/typeparams-decl.ast.txt
 go run ./examples/printastcompact -source -omit Obj,Body,Params,Results listings/typeparams-index.go.txt > listings/typeparams-index.ast.txt
-go run ./examples/printastcompact -source -omit Obj listings/typeparams-interface.go.txt > listings/typeparams-interface.ast.txt
+go run ./examples/printastcompact -source -omit Obj,Incomplete listings/typeparams-interface.go.txt > listings/typeparams-interface.ast.txt
