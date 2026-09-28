@@ -142,8 +142,14 @@ class GoDocMacro < Asciidoctor::Extensions::BlockMacroProcessor
       return create_listing_block(parent, "// go doc #{target}: 取得できませんでした", attrs.merge({ 'title' => "godoc: #{target}" }))
     end
     godoc = godoc.sub(/\Apackage .*\n\n/, '') # 新しめの go doc は先頭にパッケージ行を出す
-    godoc.sub!(/\n\n\n.*$/m, '')
-    decl, *doc = godoc.split(/^ {4}/)
+    if opts.split.include?('-all')
+      # -all では、ドキュメントの本文（4文字字下げの行）のあとに定数やメソッドなどの
+      # 宣言が続くので、本文の行だけを取り除いて宣言をすべて残す
+      decl = godoc.lines.reject { |l| l.start_with?('    ') }.join.gsub(/\n{3,}/, "\n\n").strip + "\n"
+    else
+      godoc.sub!(/\n\n\n.*$/m, '')
+      decl, *doc = godoc.split(/^ {4}/)
+    end
     decl_block = create_listing_block(
       parent,
       decl.gsub("\t", '    ').lines.map(&:chomp),
