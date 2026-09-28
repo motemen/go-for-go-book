@@ -63,7 +63,7 @@ godoc::go/ast.File[]
 
 で解説します。
 
-`Scope` と `Unresolved` は1.22で非推奨となりました。詳しくは<<ast-object-deprecation>>で解説します。
+`Scope` と `Unresolved` はGo 1.22で非推奨となりました。詳しくは<<ast-object-deprecation>>で解説します。
 
 // Imports は Decls のうち IMPORT なものをフラットに並べてるだけで parser.ImportsOnly なときに便利ってくらい？
 // 5be77a204bee72c81a8f0182d0a23bfd32b36ab9
@@ -93,7 +93,7 @@ goexample::listidents[output]
 
 godoc::go/ast.PreorderStack[]
 
-`Preorder` と名前は似ていますが形は異っており、コールバックを用います。
+`Preorder` と名前は似ていますが形は異なっており、コールバックを用います。
 
 コールバック `f` の第二引数 `stack` には、根 `root` からそのノードに至るまでのノードが順に並んでいます。ノード `n` 自身は含まれません。また `f` が `false` を返した場合、そのノードの子孫はスキップされます。
 

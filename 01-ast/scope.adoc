@@ -47,7 +47,7 @@ import "github.com/motemen/go-loghttp" // loghttp という名前が導入され
 
 上記の問題と、それに起因する利用者の混乱を理由に、link:https://github.com/golang/go/issues/52463[golang/go#52463]で `ast.Object` の非推奨化が決定されました。
 
-Go 1.22で `ast.Object` をはじめとして `ast.Ident.Obj`、`ast.Scope`、`ast.File.Scope`、`ast.File.Unresolved`, `ast.Importer`、`ast.Package`、`ast.NewPackage` が非推奨化されました。
+Go 1.22で `ast.Object` をはじめとして `ast.Ident.Obj`、`ast.Scope`、`ast.File.Scope`、`ast.File.Unresolved`、`ast.Importer`、`ast.Package`、`ast.NewPackage` が非推奨化されました。
 
 非推奨化されたとはいえ、互換性のため `parser.ParseFile` などはデフォルトでこれまで通り識別子の解決を行い、`ast.Ident.Obj` や `ast.File.Scope` を埋めようとします。
 これらのフィールドを使わないことがほとんどなので、<<parser.Mode>>で紹介した `parser.SkipObjectResolution` フラグを指定して、この処理をスキップすることが推奨されています。
