@@ -50,8 +50,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version af43867,</span>
-<span id="revdate">2026-09-28T19:27:36+09:00</span>
+<span id="revnumber">version 44b5ba8,</span>
+<span id="revdate">2026-09-28T23:07:29+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -87,6 +87,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 <li><a href="#ast_stmt">1.3.3. ast.Stmt</a></li>
 <li><a href="#ast_expr">1.3.4. ast.Expr</a></li>
 <li><a href="#その他のノード">1.3.5. その他のノード</a></li>
+<li><a href="#型パラメータの扱い">1.3.6. 型パラメータの扱い</a></li>
 <li><a href="#ast_nodeの階層">Appendix A: ast.Nodeの階層</a></li>
 </ul>
 </li>
@@ -321,7 +322,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x10b71efac040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x10b71efac060)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x3e6a5461c060), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x3e6a5461c080)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -684,7 +685,7 @@ func add(n, m int) {}
 <p>で解説します。</p>
 </div>
 <div class="paragraph">
-<p><code>Scope</code> と <code>Unresolved</code> は1.22で非推奨となりました。詳しくは<a href="#ast-object-deprecation"><code>ast.Object</code> の非推奨化</a>で解説します。</p>
+<p><code>Scope</code> と <code>Unresolved</code> はGo 1.22で非推奨となりました。詳しくは<a href="#ast-object-deprecation"><code>ast.Object</code> の非推奨化</a>で解説します。</p>
 </div>
 </div>
 <div class="sect3">
@@ -773,7 +774,7 @@ int</pre>
 </div>
 </div>
 <div class="paragraph">
-<p><code>Preorder</code> と名前は似ていますが形は異っており、コールバックを用います。</p>
+<p><code>Preorder</code> と名前は似ていますが形は異なっており、コールバックを用います。</p>
 </div>
 <div class="paragraph">
 <p>コールバック <code>f</code> の第二引数 <code>stack</code> には、根 <code>root</code> からそのノードに至るまでのノードが順に並んでいます。ノード <code>n</code> 自身は含まれません。また <code>f</code> が <code>false</code> を返した場合、そのノードの子孫はスキップされます。</p>
@@ -947,30 +948,13 @@ int    File &gt; FuncDecl &gt; FuncType &gt; FieldList &gt; Field</pre>
 <div class="paragraph">
 <p><code>Recv</code> の型である <a href="#ast.FieldList"><code>*ast.FieldList</code></a>は識別子と型の組のリストで、関数のパラメータや構造体のフィールドを表すのに使われます。</p>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<code>FieldList</code> はその名の通り複数の組を表しますが、Goの文法上、レシーバとしてはただ1つの組のみが有効です。が構造体のフィールド宣言の表現などにも使われる <code>FieldList</code> が再利用されている形です。
-</td>
-</tr>
-</table>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p><code>FieldList</code> はその名の通り複数の組を表しますが、Goの文法上、レシーバとしてはただ1つの組のみが有効です。が構造体のフィールド宣言の表現などにも使われる <code>FieldList</code> が再利用されている形です。</p>
 </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
 <div class="paragraph">
 <p>上記の事情にも関わらず、<code>go/parser</code> は複数の組からなるレシーバをエラーなく解析します！　コメントによると、シンプルさとロバスト性のためだということです。</p>
-</div>
-<div class="paragraph">
-<p>TODO: なんかいい感じに引用スタイル</p>
 </div>
 <div class="listingblock">
 <div class="title">リスト 18. src/go/parser/parser.go</div>
@@ -983,9 +967,7 @@ entries where the spec permits exactly one. Consequently, the corresponding
 field in the AST (ast.FuncDecl.Recv) field is not restricted to one entry.</pre>
 </div>
 </div>
-</td>
-</tr>
-</table>
+</div>
 </div>
 </div>
 <div class="sect4">
@@ -1209,18 +1191,6 @@ field in the AST (ast.FuncDecl.Recv) field is not restricted to one entry.</pre>
 <div class="paragraph">
 <p><code>ast.Expr</code> インタフェースはおもにGoソースコードにおける <a href="https://go.dev/ref/spec#Expressions">式</a> および <a href="https://go.dev/ref/spec#Types">型</a> に対応する構文木のノードを表します。<code>go/ast</code> パッケージの実装では以下のように分類されています：</p>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-<code>ast.Ellipsis</code> や <code>ast.KeyValueExpr</code> のように、それ単体では式となり得ないノードも <code>ast.Expr</code> を実装していますが、このおかげでこれらを含むノードの実装が簡単になっているようです。
-</td>
-</tr>
-</table>
-</div>
 <div class="ulist">
 <ul>
 <li>
@@ -1287,6 +1257,18 @@ field in the AST (ast.FuncDecl.Recv) field is not restricted to one entry.</pre>
 <p>チャンネル型（<code>ast.ChanType</code>）</p>
 </li>
 </ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>ast.Ellipsis</code> や <code>ast.KeyValueExpr</code> のように、それ単体では式となり得ないノードも <code>ast.Expr</code> を実装していますが、このおかげでこれらを含むノードの実装が簡単になっているようです。
+</td>
+</tr>
+</table>
 </div>
 <div class="sect4">
 <h5 id="ast_ident"><a class="anchor" href="#ast_ident"></a>ast.Ident</h5>
@@ -1367,8 +1349,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x351880eaa100), (*ast.Field)(0x351880eaa140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x351880eaa100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x17dc2b38c100), (*ast.Field)(0x17dc2b38c140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x17dc2b38c100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -1440,10 +1422,13 @@ fields=[]*ast.Field{(*ast.Field)(0x351880eaa100)} incomplete=true</pre>
 <p><code>ast.InterfaceType</code> &#8230;&#8203;&#8230;&#8203; インタフェースのメソッドのリストとして</p>
 </li>
 <li>
-<p><code>ast.FuncType</code>      &#8230;&#8203;&#8230;&#8203; 関数のパラメータおよび返り値として</p>
+<p><code>ast.FuncType</code>      &#8230;&#8203;&#8230;&#8203; 関数の型パラメータ、値パラメータ、返り値として</p>
 </li>
 <li>
 <p><code>ast.FuncDecl</code>      &#8230;&#8203;&#8230;&#8203; メソッドのレシーバとして</p>
+</li>
+<li>
+<p><code>ast.TypeSpec</code>      &#8230;&#8203;&#8230;&#8203; 型宣言における型パラメータとして</p>
 </li>
 </ul>
 </div>
@@ -1461,6 +1446,308 @@ TODO Names のふるまい方; nil と複数
 </td>
 </tr>
 </table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="型パラメータの扱い"><a class="anchor" href="#型パラメータの扱い"></a>1.3.6. 型パラメータの扱い</h4>
+<div class="paragraph">
+<p>型パラメータやその制約、型引数は言語仕様では式として定義されてはいませんが、構文木の上では <code>ast.Expr</code> として表現されます。これらは、半ば当然のことですが、その意味ではなく、コード上のどの位置に現れるかでその形式が決まります。</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">用途</th>
+<th class="tableblock halign-left valign-top">例</th>
+<th class="tableblock halign-left valign-top">構文木上の形式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">制約つきの型パラメータ</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[K comparable, V any]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ast.FieldList</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">型パラメータや具体化</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>List[T]</code>、<code>List[int]</code>、<code>Map[string, int]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ast.IndexExpr</code>、<code>ast.IndexListExpr</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">インタフェースの制約</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>interface{ ~int | ~float64 }</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ast.FieldList</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="sect4">
+<h5 id="制約つきの型パラメータast_fieldlist"><a class="anchor" href="#制約つきの型パラメータast_fieldlist"></a>制約つきの型パラメータ：<code>ast.FieldList</code></h5>
+<div class="paragraph">
+<p>型や関数を宣言するときには、その制約とともに型パラメータを指定します。この表記は関数のパラメータや構造体のフィールドと同型なので、同じく <code>ast.FieldList</code> で表されます。<code>ast.TypeSpec</code>、<code>ast.FuncType</code> の持つ <code>TypeParams</code> フィールドがこれにあたります。</p>
+</div>
+<div class="listingblock">
+<div class="title">リスト 28. godoc: <a href="https://pkg.go.dev/go/ast#FuncType">go/ast.FuncType</a></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">FuncType</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">Func</span>       <span class="n">token</span><span class="o">.</span><span class="n">Pos</span>  <span class="c">// position of "func" keyword (token.NoPos if there is no "func")</span>
+    <span class="n">TypeParams</span> <span class="o">*</span><span class="n">FieldList</span> <span class="c">// type parameters; or nil</span>
+    <span class="n">Params</span>     <span class="o">*</span><span class="n">FieldList</span> <span class="c">// (incoming) parameters; non-nil</span>
+    <span class="n">Results</span>    <span class="o">*</span><span class="n">FieldList</span> <span class="c">// (outgoing) results; or nil</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">リスト 29. godoc: <a href="https://pkg.go.dev/go/ast#TypeSpec">go/ast.TypeSpec</a></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">TypeSpec</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">Doc</span>        <span class="o">*</span><span class="n">CommentGroup</span> <span class="c">// associated documentation; or nil</span>
+    <span class="n">Name</span>       <span class="o">*</span><span class="n">Ident</span>        <span class="c">// type name</span>
+    <span class="n">TypeParams</span> <span class="o">*</span><span class="n">FieldList</span>    <span class="c">// type parameters; or nil</span>
+    <span class="n">Assign</span>     <span class="n">token</span><span class="o">.</span><span class="n">Pos</span>     <span class="c">// position of '=', if any</span>
+    <span class="n">Type</span>       <span class="n">Expr</span>          <span class="c">// *Ident, *ParenExpr, *SelectorExpr, *StarExpr, or any of the *XxxTypes</span>
+    <span class="n">Comment</span>    <span class="o">*</span><span class="n">CommentGroup</span> <span class="c">// line comments; or nil</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ast.FieldList</code> は複数の <code>ast.Field</code> を持ち、ここでは <code>ast.Field.Names</code> が型パラメータの名前を、<code>ast.Field.Type</code> が型パラメータの制約を表します。型の制約には <code>~int | ~float64</code> のように型の集合を指定できますが、これは <code>ast.UnaryExpr</code>（<code>~</code>）や <code>ast.BinaryExpr</code>（<code>|</code>）として表されます。</p>
+</div>
+<div class="paragraph">
+<p>以下の型、関数、メソッドの宣言を解析すると、それぞれ次のようになります。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Map</span><span class="p">[</span><span class="n">K</span> <span class="n">comparable</span><span class="p">,</span> <span class="n">V</span> <span class="n">any</span><span class="p">]</span> <span class="k">map</span><span class="p">[</span><span class="n">K</span><span class="p">]</span><span class="n">V</span>
+
+<span class="k">func</span> <span class="n">Sum</span><span class="p">[</span><span class="n">T</span> <span class="err">~</span><span class="kt">int</span> <span class="o">|</span> <span class="err">~</span><span class="kt">float64</span><span class="p">](</span><span class="n">xs</span> <span class="p">[]</span><span class="n">T</span><span class="p">)</span> <span class="n">T</span> <span class="p">{</span> <span class="c">/* ... */</span> <span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">l</span> <span class="n">List</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="n">Map</span><span class="p">[</span><span class="n">U</span> <span class="n">any</span><span class="p">](</span><span class="n">f</span> <span class="k">func</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="n">U</span><span class="p">)</span> <span class="n">List</span><span class="p">[</span><span class="n">U</span><span class="p">]</span> <span class="p">{</span> <span class="c">/* ... */</span> <span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>// type Map[K comparable, V any] map[K]V
+*ast.GenDecl {
+    Tok: type
+    Specs: [
+        *ast.TypeSpec {
+            Name: *ast.Ident { Name: "Map" }
+            TypeParams: *ast.FieldList {
+                List: [
+                    *ast.Field {
+                        Names: [K]
+                        Type: *ast.Ident { Name: "comparable" }
+                    }
+                    *ast.Field { Names: [V], Type: *ast.Ident { Name: "any" } }
+                ]
+            }
+            Type: *ast.MapType {
+                Key: *ast.Ident { Name: "K" }
+                Value: *ast.Ident { Name: "V" }
+            }
+        }
+    ]
+}
+
+// func Sum[T ~int | ~float64](xs []T) T
+*ast.FuncDecl {
+    Name: *ast.Ident { Name: "Sum" }
+    Type: *ast.FuncType {
+        TypeParams: *ast.FieldList {
+            List: [
+                *ast.Field {
+                    Names: [T]
+                    Type: *ast.BinaryExpr {
+                        X: *ast.UnaryExpr { Op: ~, X: *ast.Ident { Name: "int" } }
+                        Op: |
+                        Y: *ast.UnaryExpr { Op: ~, X: *ast.Ident { Name: "float64" } }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+// func (l List[T]) Map[U any](f func(T) U) List[U]
+*ast.FuncDecl {
+    Recv: *ast.FieldList {
+        List: [
+            *ast.Field {
+                Names: [l]
+                Type: *ast.IndexExpr {
+                    X: *ast.Ident { Name: "List" }
+                    Index: *ast.Ident { Name: "T" }
+                }
+            }
+        ]
+    }
+    Name: *ast.Ident { Name: "Map" }
+    Type: *ast.FuncType {
+        TypeParams: *ast.FieldList {
+            List: [
+                *ast.Field { Names: [U], Type: *ast.Ident { Name: "any" } }
+            ]
+        }
+    }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="型パラメータや具体化ast_indexexpr_と_ast_indexlistexpr"><a class="anchor" href="#型パラメータや具体化ast_indexexpr_と_ast_indexlistexpr"></a>型パラメータや具体化：<code>ast.IndexExpr</code> と <code>ast.IndexListExpr</code></h5>
+<div class="paragraph">
+<p>ジェネリックな型のメソッドのレシーバ（<code>func (m Map[K, V]) Empty() bool</code>）や型の具体化（<code>List[int]</code> や <code>Map[string, int]</code>）は、構文木の上では <code>ast.IndexExpr</code> もしくは <code>ast.IndexListExpr</code> として表されます。</p>
+</div>
+<div class="paragraph">
+<p>構文木を確認してみましょう。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">m</span> <span class="n">Map</span><span class="p">[</span><span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">])</span> <span class="n">Empty</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">==</span> <span class="m">0</span> <span class="p">}</span>
+
+<span class="k">var</span> <span class="n">l</span> <span class="n">List</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>// func (m Map[K, V]) Empty() bool
+*ast.FuncDecl {
+    Recv: *ast.FieldList {
+        List: [
+            *ast.Field {
+                Names: [m]
+                Type: *ast.IndexListExpr {
+                    X: *ast.Ident { Name: "Map" }
+                    Indices: [
+                        *ast.Ident { Name: "K" }
+                        *ast.Ident { Name: "V" }
+                    ]
+                }
+            }
+        ]
+    }
+    Name: *ast.Ident { Name: "Empty" }
+    Type: *ast.FuncType {}
+}
+
+// var l List[int]
+*ast.GenDecl {
+    Tok: var
+    Specs: [
+        *ast.ValueSpec {
+            Names: [l]
+            Type: *ast.IndexExpr {
+                X: *ast.Ident { Name: "List" }
+                Index: *ast.Ident { Name: "int" }
+            }
+        }
+    ]
+}</pre>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>型の具体化 <code>List[int]</code> も配列の添字アクセス <code>a[0]</code> も、構文木の上ではどちらも <code>ast.IndexExpr</code> で、区別がつきません。<code>X[Y]</code> が具体化なのか添字アクセスなのかを知るには型の情報が必要です（&#8594; <a href="#型解析">型解析</a>）。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="インタフェースの制約ast_fieldlist"><a class="anchor" href="#インタフェースの制約ast_fieldlist"></a>インタフェースの制約：ast.FieldList</h5>
+<div class="paragraph">
+<p>型の制約を含むインタフェース（<a href="https://go.dev/ref/spec#General_interfaces">General interfaces</a>）には、メソッドのほかに <code>int</code> や <code>~int | ~float64</code> といった型の集合を書けます。</p>
+</div>
+<div class="paragraph">
+<p>これも <code>ast.FieldList</code> のエントリとして表され、ジェネリクス登場以前から存在していた <code>ast.InterfaceType.Methods</code> フィールドの中に含まれます。</p>
+</div>
+<div class="listingblock">
+<div class="title">リスト 30. godoc: <a href="https://pkg.go.dev/go/ast#InterfaceType">go/ast.InterfaceType</a></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">InterfaceType</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">Interface</span>  <span class="n">token</span><span class="o">.</span><span class="n">Pos</span>  <span class="c">// position of "interface" keyword</span>
+    <span class="n">Methods</span>    <span class="o">*</span><span class="n">FieldList</span> <span class="c">// list of embedded interfaces, methods, or types</span>
+    <span class="n">Incomplete</span> <span class="kt">bool</span>       <span class="c">// true if (source) methods or types are missing in the Methods list</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>エントリである <code>ast.Field</code> では、インタフェースのメソッドは <code>Names</code> がその名前、<code>Type</code> が <code>ast.FuncType</code> として表され、型の集合においては <code>Names</code> が空、<code>Type</code> が制約を表わす式で表現されます。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Number</span> <span class="k">interface</span> <span class="p">{</span>
+	<span class="err">~</span><span class="kt">int</span> <span class="o">|</span> <span class="err">~</span><span class="kt">float64</span>
+	<span class="n">String</span><span class="p">()</span> <span class="kt">string</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>// type Number interface {
+// 	~int | ~float64
+// 	String() string
+// }
+*ast.GenDecl {
+    Tok: type
+    Specs: [
+        *ast.TypeSpec {
+            Name: *ast.Ident { Name: "Number" }
+            Type: *ast.InterfaceType {
+                Methods: *ast.FieldList {
+                    List: [
+                        *ast.Field {
+                            Type: *ast.BinaryExpr {
+                                X: *ast.UnaryExpr {
+                                    Op: ~
+                                    X: *ast.Ident { Name: "int" }
+                                }
+                                Op: |
+                                Y: *ast.UnaryExpr {
+                                    Op: ~
+                                    X: *ast.Ident { Name: "float64" }
+                                }
+                            }
+                        }
+                        *ast.Field {
+                            Names: [String]
+                            Type: *ast.FuncType {
+                                Params: *ast.FieldList {}
+                                Results: *ast.FieldList {
+                                    List: [
+                                        *ast.Field {
+                                            Type: *ast.Ident { Name: "string" }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+                Incomplete: false
+            }
+        }
+    ]
+}</pre>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph">
+<p>ジェネリクスとともに導入された <code>~</code> が単項演算子として扱われているため、<code>var y = ~1</code> のような不正な式も構文解析は通ります。また、型の集合を含むインタフェースを <code>var x interface{ ~int }</code> のように普通の型として使った場合も、構文解析は通ります。これらをエラーとするのは型チェッカーの役割です（&#8594; <a href="#型解析">型解析</a>）。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">var</span> <span class="n">y</span> <span class="o">=</span> <span class="err">~</span><span class="m">1</span>              <span class="c">// 型チェックで cannot use ~ outside of interface or type constraint (use ^ for bitwise complement)</span>
+<span class="k">var</span> <span class="n">x</span> <span class="k">interface</span><span class="p">{</span> <span class="err">~</span><span class="kt">int</span> <span class="p">}</span> <span class="c">// 型チェックで cannot use type interface{~int} outside a type constraint: interface contains type constraints</span></code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1555,7 +1842,7 @@ quickfix.go:76: go/ast.ExprStmt composite literal uses unkeyed fields</pre>
 <p>すべての抽象構文木のノードは<a href="#ast_node">ast.Node</a>インタフェースを実装しているのでした。<code>ast.Node</code> は <code>token.Pos</code> を返す <code>Pos()</code> と <code>End()</code> の2つのメソッドで構成されます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 28. godoc: <a href="https://pkg.go.dev/go/ast#Node">go/ast.Node</a></div>
+<div class="title">リスト 31. godoc: <a href="https://pkg.go.dev/go/ast#Node">go/ast.Node</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Node</span> <span class="k">interface</span> <span class="p">{</span>
     <span class="n">Pos</span><span class="p">()</span> <span class="n">token</span><span class="o">.</span><span class="n">Pos</span> <span class="c">// position of first character belonging to the node</span>
@@ -1567,7 +1854,7 @@ quickfix.go:76: go/ast.ExprStmt composite literal uses unkeyed fields</pre>
 <p>これらはその名とコメントの示すとおり、当該のノードがソースコード上に占める開始位置と終了位置を表しています。<code>token.Pos</code> の実体は基準位置からオフセットを示す <code>int</code> 型です。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 29. godoc: <a href="https://pkg.go.dev/go/token#Pos">go/token.Pos</a></div>
+<div class="title">リスト 32. godoc: <a href="https://pkg.go.dev/go/token#Pos">go/token.Pos</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Pos</span> <span class="kt">int</span></code></pre>
 </div>
@@ -1576,7 +1863,7 @@ quickfix.go:76: go/ast.ExprStmt composite literal uses unkeyed fields</pre>
 <p>オフセット値は <code>1</code> から始まるバイト単位の値です。特に、<code>token.Pos</code> のzero value（= <code>0</code>）には <code>token.NoPos</code> という特別な名前が与えられています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 30. godoc: <a href="https://pkg.go.dev/go/token#NoPos">go/token.NoPos</a></div>
+<div class="title">リスト 33. godoc: <a href="https://pkg.go.dev/go/token#NoPos">go/token.NoPos</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">const</span> <span class="n">NoPos</span> <span class="n">Pos</span> <span class="o">=</span> <span class="m">0</span></code></pre>
 </div>
@@ -1612,7 +1899,7 @@ quickfix.go:76: go/ast.ExprStmt composite literal uses unkeyed fields</pre>
 <div class="sect3">
 <h4 id="token_fileset"><a class="anchor" href="#token_fileset"></a>1.4.2. token.FileSet</h4>
 <div class="listingblock">
-<div class="title">リスト 31. godoc: <a href="https://pkg.go.dev/go/token#FileSet">go/token.FileSet</a></div>
+<div class="title">リスト 34. godoc: <a href="https://pkg.go.dev/go/token#FileSet">go/token.FileSet</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">FileSet</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="c">// Has unexported fields.</span>
@@ -1629,7 +1916,7 @@ quickfix.go:76: go/ast.ExprStmt composite literal uses unkeyed fields</pre>
 <p>興味あるソースファイル集合に対して1つあれば十分なので、いちど <code>token.NewFileSet()</code> で生成した参照を保持しておくのが普通です。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 32. godoc: <a href="https://pkg.go.dev/go/token#NewFileSet">go/token.NewFileSet</a></div>
+<div class="title">リスト 35. godoc: <a href="https://pkg.go.dev/go/token#NewFileSet">go/token.NewFileSet</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="n">NewFileSet</span><span class="p">()</span> <span class="o">*</span><span class="n">FileSet</span></code></pre>
 </div>
@@ -1670,7 +1957,7 @@ quickfix.go:76: go/ast.ExprStmt composite literal uses unkeyed fields</pre>
 <div class="sect3">
 <h4 id="token_position"><a class="anchor" href="#token_position"></a>1.4.3. token.Position</h4>
 <div class="listingblock">
-<div class="title">リスト 33. godoc: <a href="https://pkg.go.dev/go/token#Position">go/token.Position</a></div>
+<div class="title">リスト 36. godoc: <a href="https://pkg.go.dev/go/token#Position">go/token.Position</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Position</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">Filename</span> <span class="kt">string</span> <span class="c">// filename, if any</span>
@@ -1684,7 +1971,7 @@ quickfix.go:76: go/ast.ExprStmt composite literal uses unkeyed fields</pre>
 <p><code>token.Position</code> 構造体はファイル名、行番号、カラム位置を持ち、ソースコード中の位置としては最も詳細な情報を含みます。<code>String()</code> メソッドによってわかりやすい位置情報が得られます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 34. positionstring.go <span class="icon"><a class="image" href="https://go.dev/play/p/lBJWYcUtVe" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 37. positionstring.go <span class="icon"><a class="image" href="https://go.dev/play/p/lBJWYcUtVe" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -1722,7 +2009,7 @@ Valid position with file name:      example.go:2:3</pre>
 <p>ソースコード中の識別子を表す <code>ast.Ident</code> には、<code>*ast.Object</code> 型の <code>Obj</code> というフィールドが定義されていました。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 35. godoc: <a href="https://pkg.go.dev/go/ast#Ident">go/ast.Ident</a></div>
+<div class="title">リスト 38. godoc: <a href="https://pkg.go.dev/go/ast#Ident">go/ast.Ident</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Ident</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">NamePos</span> <span class="n">token</span><span class="o">.</span><span class="n">Pos</span> <span class="c">// identifier position</span>
@@ -1760,7 +2047,7 @@ Valid position with file name:      example.go:2:3</pre>
 <p>有名な例として、以下のプログラムには <code>T{k: 0}</code> という同じ形をしたコードが出現します。ここで <code>k</code> が指すものは一方ではトップレベルの定数、もう一方では構造体のフィールドと、それぞれ違ったものになります（<a href="https://github.com/golang/example/tree/master/gotypes"><code>go/types</code>: The Go Type Checker</a> より）。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 36. indeterminableident.go <span class="icon"><a class="image" href="https://go.dev/play/p/DEqNP5JAY-" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 39. indeterminableident.go <span class="icon"><a class="image" href="https://go.dev/play/p/DEqNP5JAY-" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">p</span>
 
@@ -1795,7 +2082,7 @@ Valid position with file name:      example.go:2:3</pre>
 <p>上記の問題と、それに起因する利用者の混乱を理由に、<a href="https://github.com/golang/go/issues/52463">golang/go#52463</a>で <code>ast.Object</code> の非推奨化が決定されました。</p>
 </div>
 <div class="paragraph">
-<p>Go 1.22で <code>ast.Object</code> をはじめとして <code>ast.Ident.Obj</code>、<code>ast.Scope</code>、<code>ast.File.Scope</code>、<code>ast.File.Unresolved</code>, <code>ast.Importer</code>、<code>ast.Package</code>、<code>ast.NewPackage</code> が非推奨化されました。</p>
+<p>Go 1.22で <code>ast.Object</code> をはじめとして <code>ast.Ident.Obj</code>、<code>ast.Scope</code>、<code>ast.File.Scope</code>、<code>ast.File.Unresolved</code>、<code>ast.Importer</code>、<code>ast.Package</code>、<code>ast.NewPackage</code> が非推奨化されました。</p>
 </div>
 <div class="paragraph">
 <p>非推奨化されたとはいえ、互換性のため <code>parser.ParseFile</code> などはデフォルトでこれまで通り識別子の解決を行い、<code>ast.Ident.Obj</code> や <code>ast.File.Scope</code> を埋めようとします。
@@ -1831,13 +2118,13 @@ Valid position with file name:      example.go:2:3</pre>
 <p><code>parser.ParseFile</code> の第4引数 <code>mode</code> に <code>parser.ParseComments</code> 定数を指定することで、構文解析の結果にコメントを含めることができます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 37. godoc: <a href="https://pkg.go.dev/go/parser#ParseFile">go/parser.ParseFile</a></div>
+<div class="title">リスト 40. godoc: <a href="https://pkg.go.dev/go/parser#ParseFile">go/parser.ParseFile</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span> <span class="o">*</span><span class="n">token</span><span class="o">.</span><span class="n">FileSet</span><span class="p">,</span> <span class="n">filename</span> <span class="kt">string</span><span class="p">,</span> <span class="n">src</span> <span class="n">any</span><span class="p">,</span> <span class="n">mode</span> <span class="n">Mode</span><span class="p">)</span> <span class="p">(</span><span class="n">f</span> <span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">File</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">リスト 38. parsecomment.go <span class="icon"><a class="image" href="https://go.dev/play/p/uDWRwBuOQx" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 41. parsecomment.go <span class="icon"><a class="image" href="https://go.dev/play/p/uDWRwBuOQx" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -1890,7 +2177,7 @@ example.go:5:1: "Add adds two ints.\n"</pre>
 <p>が、ひとつの <code>ast.Comment</code> に対応します。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 39. godoc: <a href="https://pkg.go.dev/go/ast#CommentGroup">go/ast.CommentGroup</a></div>
+<div class="title">リスト 42. godoc: <a href="https://pkg.go.dev/go/ast#CommentGroup">go/ast.CommentGroup</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">CommentGroup</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">List</span> <span class="p">[]</span><span class="o">*</span><span class="n">Comment</span> <span class="c">// len(List) &gt; 0</span>
@@ -1898,7 +2185,7 @@ example.go:5:1: "Add adds two ints.\n"</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">リスト 40. godoc: <a href="https://pkg.go.dev/go/ast#Comment">go/ast.Comment</a></div>
+<div class="title">リスト 43. godoc: <a href="https://pkg.go.dev/go/ast#Comment">go/ast.Comment</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Comment</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">Slash</span> <span class="n">token</span><span class="o">.</span><span class="n">Pos</span> <span class="c">// position of "/" starting the comment</span>
@@ -1939,7 +2226,7 @@ func ParseFile(fset *token.FileSet, filename string, src interface{}, mode Mode)
 </div>
 </div>
 <div class="listingblock">
-<div class="title">リスト 41. src/go/parser/interface.go</div>
+<div class="title">リスト 44. src/go/parser/interface.go</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="c">// ParseFile parses the source code of a single Go source file and returns</span>
 <span class="c">// the corresponding ast.File node. The source code may be provided via</span>
@@ -1956,7 +2243,7 @@ func ParseFile(fset *token.FileSet, filename string, src interface{}, mode Mode)
 <p>Goパッケージの（ソースコードから生成される）ドキュメントは、<code>doc.Package</code> として表現されます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 42. godoc: <a href="https://pkg.go.dev/go/doc#Package">go/doc.Package</a></div>
+<div class="title">リスト 45. godoc: <a href="https://pkg.go.dev/go/doc#Package">go/doc.Package</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Package</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">Doc</span>        <span class="kt">string</span>
@@ -1989,7 +2276,7 @@ func ParseFile(fset *token.FileSet, filename string, src interface{}, mode Mode)
 <p><code>doc.Package</code> は <code>doc.NewFromFiles</code> 関数によって、パッケージを構成するファイルの構文木（<code>[]*ast.File</code>）から生成されます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 43. godoc: <a href="https://pkg.go.dev/go/doc#NewFromFiles">go/doc.NewFromFiles</a> <span class="version-badge version-badge-since">Go 1.14で追加</span></div>
+<div class="title">リスト 46. godoc: <a href="https://pkg.go.dev/go/doc#NewFromFiles">go/doc.NewFromFiles</a> <span class="version-badge version-badge-since">Go 1.14で追加</span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="n">NewFromFiles</span><span class="p">(</span><span class="n">fset</span> <span class="o">*</span><span class="n">token</span><span class="o">.</span><span class="n">FileSet</span><span class="p">,</span> <span class="n">files</span> <span class="p">[]</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">File</span><span class="p">,</span> <span class="n">importPath</span> <span class="kt">string</span><span class="p">,</span> <span class="n">opts</span> <span class="o">...</span><span class="n">any</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">Package</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span></code></pre>
 </div>
@@ -2016,7 +2303,7 @@ func ParseFile(fset *token.FileSet, filename string, src interface{}, mode Mode)
 <p>とくに、<code>NewFromFiles</code> のコメントにある通り、<code>PreserveAST</code> を指定しない限り <code>doc.NewFromFiles</code> は与えられた構文木を書き換えることがあります。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 44. godoc: <a href="https://pkg.go.dev/go/doc#AllDecls">go/doc.AllDecls</a></div>
+<div class="title">リスト 47. godoc: <a href="https://pkg.go.dev/go/doc#AllDecls">go/doc.AllDecls</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">const</span> <span class="p">(</span>
     <span class="c">// AllDecls says to extract documentation for all package-level</span>
@@ -2180,7 +2467,7 @@ WIP
 <p><code>types</code> パッケージによる型チェックは、<code>types.Config</code> 構造体の <code>Check</code> メソッドを呼ぶところから始まります。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 45. godoc: <a href="https://pkg.go.dev/go/types#Config.Check">go/types.Config.Check</a></div>
+<div class="title">リスト 48. godoc: <a href="https://pkg.go.dev/go/types#Config.Check">go/types.Config.Check</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">conf</span> <span class="o">*</span><span class="n">Config</span><span class="p">)</span> <span class="n">Check</span><span class="p">(</span><span class="n">path</span> <span class="kt">string</span><span class="p">,</span> <span class="n">fset</span> <span class="o">*</span><span class="n">token</span><span class="o">.</span><span class="n">FileSet</span><span class="p">,</span> <span class="n">files</span> <span class="p">[]</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">File</span><span class="p">,</span> <span class="n">info</span> <span class="o">*</span><span class="n">Info</span><span class="p">)</span> <span class="p">(</span><span class="o">*</span><span class="n">Package</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span></code></pre>
 </div>
@@ -2192,7 +2479,7 @@ WIP
 <p>最後の引数である <code>info *types.Info</code> は、パッケージ内の型にまつわる詳細な情報を格納する先として指定します。単純に型チェックを行いたいだけの場合は <code>nil</code> でも構いません。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 46. typechecksimple.go <span class="icon"><a class="image" href="https://go.dev/play/p/szN-pDyXak" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 49. typechecksimple.go <span class="icon"><a class="image" href="https://go.dev/play/p/szN-pDyXak" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2241,7 +2528,7 @@ string</pre>
 <p>先ほどの例では <code>Config.Importer</code> を設定していました。これは <code>types.Importer</code> という型を持つフィールドです。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 47. godoc: <a href="https://pkg.go.dev/go/types#Importer">go/types.Importer</a></div>
+<div class="title">リスト 50. godoc: <a href="https://pkg.go.dev/go/types#Importer">go/types.Importer</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Importer</span> <span class="k">interface</span> <span class="p">{</span>
     <span class="c">// Import returns the imported package for the given import path.</span>
@@ -2258,7 +2545,7 @@ string</pre>
 <p>この具体的な実装を提供するのが <code>go/importer</code> パッケージです。<code>importer.Default()</code> は実行中のバイナリのコンパイラ（<code>runtime.Compiler</code>）に対応するインポートの実装を返します。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 48. godoc: <a href="https://pkg.go.dev/go/importer#Default">go/importer.Default</a></div>
+<div class="title">リスト 51. godoc: <a href="https://pkg.go.dev/go/importer#Default">go/importer.Default</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="n">Default</span><span class="p">()</span> <span class="n">types</span><span class="o">.</span><span class="n">Importer</span></code></pre>
 </div>
@@ -2267,7 +2554,7 @@ string</pre>
 <p>以下はパッケージを読み込み、そのパッケージが公開している名前および依存しているパッケージの情報を印字する例です。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 49. importer.go <span class="icon"><a class="image" href="https://go.dev/play/p/jdhTpuTc6k" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 52. importer.go <span class="icon"><a class="image" href="https://go.dev/play/p/jdhTpuTc6k" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2299,7 +2586,7 @@ string</pre>
 <p><code>types.Config</code> 構造体が <code>go/types</code> パッケージのエントリポイントとなります。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 50. godoc: <a href="https://pkg.go.dev/go/types#Config">go/types.Config</a></div>
+<div class="title">リスト 53. godoc: <a href="https://pkg.go.dev/go/types#Config">go/types.Config</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Config</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="c">// Context is the context used for resolving global identifiers. If nil, the</span>
@@ -2368,7 +2655,7 @@ string</pre>
 <p>型チェック時のエラーは <code>types.Error</code> 構造体によって表現されます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 51. godoc: <a href="https://pkg.go.dev/go/types#Error">go/types.Error</a></div>
+<div class="title">リスト 54. godoc: <a href="https://pkg.go.dev/go/types#Error">go/types.Error</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Error</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">Fset</span> <span class="o">*</span><span class="n">token</span><span class="o">.</span><span class="n">FileSet</span> <span class="c">// file set for interpretation of Pos</span>
@@ -2410,7 +2697,7 @@ string</pre>
 <p>以下で、ソフトなエラーとそうでない重篤なエラーの例を確認できます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 52. typecheckerrors.go <span class="icon"><a class="image" href="https://go.dev/play/p/GJ5RPbyr4K" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 55. typecheckerrors.go <span class="icon"><a class="image" href="https://go.dev/play/p/GJ5RPbyr4K" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2468,7 +2755,7 @@ example.go:7:2: invalid operation: s + 1 (mismatched types string and untyped in
 <div class="sect3">
 <h4 id="types_package"><a class="anchor" href="#types_package"></a>4.5.1. types.Package</h4>
 <div class="listingblock">
-<div class="title">リスト 53. godoc: <a href="https://pkg.go.dev/go/types#Package">go/types.Package</a></div>
+<div class="title">リスト 56. godoc: <a href="https://pkg.go.dev/go/types#Package">go/types.Package</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Package</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="c">// Has unexported fields.</span>
@@ -2482,7 +2769,7 @@ example.go:7:2: invalid operation: s + 1 (mismatched types string and untyped in
 <p>あまり意味のない例ですが、以下では <code>$GOROOT/src/cmd/cover</code> ディレクトリのソースコードの型チェックを行っています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 54. typechecknameandpath.go <span class="icon"><a class="image" href="https://go.dev/play/p/p6PF6GRqiW" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 57. typechecknameandpath.go <span class="icon"><a class="image" href="https://go.dev/play/p/p6PF6GRqiW" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2530,13 +2817,13 @@ path=cmd/cover name=main</pre>
 <p><code>Path</code> や <code>Name</code> などの基本的な情報の他に有用なのは、解析されたパッケージのスコープ情報でしょう。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 55. godoc: <a href="https://pkg.go.dev/go/types#Package.Scope">go/types.Package.Scope</a></div>
+<div class="title">リスト 58. godoc: <a href="https://pkg.go.dev/go/types#Package.Scope">go/types.Package.Scope</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">pkg</span> <span class="o">*</span><span class="n">Package</span><span class="p">)</span> <span class="n">Scope</span><span class="p">()</span> <span class="o">*</span><span class="n">Scope</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">リスト 56. godoc: <a href="https://pkg.go.dev/go/types#Scope">go/types.Scope</a></div>
+<div class="title">リスト 59. godoc: <a href="https://pkg.go.dev/go/types#Scope">go/types.Scope</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Scope</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="c">// Has unexported fields.</span>
@@ -2550,13 +2837,13 @@ path=cmd/cover name=main</pre>
 <p>スコープは階層構造になっていて、<code>Parent()</code> および <code>Child()</code> メソッドによりその親（ひとつ外側のスコープ）や子にアクセスできます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 57. godoc: <a href="https://pkg.go.dev/go/types#Scope.Parent">go/types.Scope.Parent</a></div>
+<div class="title">リスト 60. godoc: <a href="https://pkg.go.dev/go/types#Scope.Parent">go/types.Scope.Parent</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="o">*</span><span class="n">Scope</span><span class="p">)</span> <span class="n">Parent</span><span class="p">()</span> <span class="o">*</span><span class="n">Scope</span></code></pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">リスト 58. godoc: <a href="https://pkg.go.dev/go/types#Scope.Child">go/types.Scope.Child</a></div>
+<div class="title">リスト 61. godoc: <a href="https://pkg.go.dev/go/types#Scope.Child">go/types.Scope.Child</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">s</span> <span class="o">*</span><span class="n">Scope</span><span class="p">)</span> <span class="n">Child</span><span class="p">(</span><span class="n">i</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="n">Scope</span></code></pre>
 </div>
@@ -2570,7 +2857,7 @@ path=cmd/cover name=main</pre>
 <p>以下の例では、ユニバーススコープに定義されている名前を列挙しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 59. typesuniverse.go <span class="icon"><a class="image" href="https://go.dev/play/p/JJV5RT5h_e" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 62. typesuniverse.go <span class="icon"><a class="image" href="https://go.dev/play/p/JJV5RT5h_e" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2600,7 +2887,7 @@ path=cmd/cover name=main</pre>
 <p><code>types</code> パッケージにおけるオブジェクトは、<code>ast</code> パッケージにおけるそれと異なり、インタフェースとして表現されています。また、より詳しい情報を持ちます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 60. godoc: <a href="https://pkg.go.dev/go/types#Object">go/types.Object</a></div>
+<div class="title">リスト 63. godoc: <a href="https://pkg.go.dev/go/types#Object">go/types.Object</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Object</span> <span class="k">interface</span> <span class="p">{</span>
     <span class="n">Parent</span><span class="p">()</span> <span class="o">*</span><span class="n">Scope</span> <span class="c">// scope in which this object is declared; nil for methods and struct fields</span>
@@ -2659,7 +2946,7 @@ path=cmd/cover name=main</pre>
 <p>組み込み関数を表します。組み込み関数は決まった型を持たないため、<code>Type()</code> はinvalidな型を返します。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 61. typesbuiltin.go <span class="icon"><a class="image" href="https://go.dev/play/p/0ZaB6DWlye" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 64. typesbuiltin.go <span class="icon"><a class="image" href="https://go.dev/play/p/0ZaB6DWlye" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2688,7 +2975,7 @@ invalid type (*types.Basic)</pre>
 <p>定数を表します。<code>Val()</code> メソッドは、その定数値を表す <code>go/constant</code> パッケージの値を返します。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 62. godoc: <a href="https://pkg.go.dev/go/types#Const.Val">go/types.Const.Val</a></div>
+<div class="title">リスト 65. godoc: <a href="https://pkg.go.dev/go/types#Const.Val">go/types.Const.Val</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">obj</span> <span class="o">*</span><span class="n">Const</span><span class="p">)</span> <span class="n">Val</span><span class="p">()</span> <span class="n">constant</span><span class="o">.</span><span class="n">Value</span></code></pre>
 </div>
@@ -2697,7 +2984,7 @@ invalid type (*types.Basic)</pre>
 <p><a href="https://go.dev/ref/spec#Constant_expressions">定数式</a>は型チェック時に評価され、値としてオブジェクトに保持されます（TODO: 定数畳み込み）。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 63. typesconst.go <span class="icon"><a class="image" href="https://go.dev/play/p/6QfOZ6VFWX" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 66. typesconst.go <span class="icon"><a class="image" href="https://go.dev/play/p/6QfOZ6VFWX" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2761,7 +3048,7 @@ const (
 <p>以下で、それぞれの場合（トップレベルの関数 <code>F</code>、型 <code>*T</code> のメソッド <code>F</code>、インタフェース <code>I</code> のメソッド <code>F</code>）の出現を確認しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 64. typesfunc.go <span class="icon"><a class="image" href="https://go.dev/play/p/jO77omVeV8" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 67. typesfunc.go <span class="icon"><a class="image" href="https://go.dev/play/p/jO77omVeV8" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2850,7 +3137,7 @@ func (path/to/pkg.I).F()</pre>
 <p>インポートしたパッケージの名前はパッケージスコープではなくファイルスコープに導入されるため、後の節で説明する<a href="#types_info"><code>Info</code> 構造体</a>を使ってファイルスコープを取得しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 65. typespkgname.go <span class="icon"><a class="image" href="https://go.dev/play/p/AIQENS7mLZ" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 68. typespkgname.go <span class="icon"><a class="image" href="https://go.dev/play/p/AIQENS7mLZ" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2959,7 +3246,7 @@ TBD
 <p>などについて（ただちには）知ることができません。そこで <code>Check</code> 関数の最後の引数に渡す構造体、<code>types.Info</code> の出番となります。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 66. godoc: <a href="https://pkg.go.dev/go/types#Info">go/types.Info</a></div>
+<div class="title">リスト 69. godoc: <a href="https://pkg.go.dev/go/types#Info">go/types.Info</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Info</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="c">// Types maps expressions to their types, and for constant</span>
@@ -3323,7 +3610,7 @@ type Node interface {
 <p><code>go doc</code> サブコマンドに与えられるコマンドライン引数は、ユーザの意図を表した以下のような形の文字列のリストになっています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 67. go doc -h</div>
+<div class="title">リスト 70. go doc -h</div>
 <div class="content">
 <pre>% go doc -h
 Usage of [go] doc:
@@ -3533,7 +3820,7 @@ Usage of [go] doc:
 <p><code>go doc golang.org/x/tools/cmd/stringer</code> にある例を見るのが分かりやすいでしょう。以下のように定数を定義したソースコードを書いたとします。この定数を表示するため <code>fmt.Print(Uni)</code> などとしても、<code>2</code> と印字されるだけでどんな意味を持った値なのかの情報に欠けてしまっています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 68. sushi.go <span class="icon"><a class="image" href="https://go.dev/play/p/4AKhfaOgQp" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 71. sushi.go <span class="icon"><a class="image" href="https://go.dev/play/p/4AKhfaOgQp" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">sushi</span>
 
@@ -3551,7 +3838,7 @@ Usage of [go] doc:
 <p><code>fmt</code> パッケージのメソッドは、値が <code>fmt.Stringer</code> インタフェースを満たしていればその <code>String()</code> メソッドを利用するので、ここで <code>Sushi.String()</code> が定数の名前を返すようにすればいいはずです。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 69. godoc: <a href="https://pkg.go.dev/fmt#Stringer">fmt.Stringer</a></div>
+<div class="title">リスト 72. godoc: <a href="https://pkg.go.dev/fmt#Stringer">fmt.Stringer</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Stringer</span> <span class="k">interface</span> <span class="p">{</span>
     <span class="n">String</span><span class="p">()</span> <span class="kt">string</span>
@@ -3562,7 +3849,7 @@ Usage of [go] doc:
 <p>見るからに単調な作業なので、プログラム的に生成することを考えますよね。そこで <code>stringer</code> の出番です。以上のような内容のソースコード <code>sushi.go</code> に対して <code>stringer -type Sushi sushi.go</code> を実行すると、次のソースコードが <code>sushi_string.go</code> として生成されます。</p>
 </div>
 <div id="sushi_string.go" class="listingblock">
-<div class="title">リスト 70. sushi_string.go <span class="icon"><a class="image" href="https://go.dev/play/p/gfirJbaQVX" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 73. sushi_string.go <span class="icon"><a class="image" href="https://go.dev/play/p/gfirJbaQVX" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="c">// Code generated by "stringer -type Sushi sushi.go"; DO NOT EDIT</span>
 
@@ -3616,7 +3903,7 @@ Usage of [go] doc:
 <p>ソースコードファイルのリストは構文解析されたのち、<code>go/types</code> のAPIで型チェックされます。この際、型の定義の情報も収集するようになっており、これが後の工程で必要になってきます。定義の情報は <code>map[*ast.Ident]types.Object</code> の形で保持され、ソースコード中に出現する識別子の、その言語上の役割や型などの情報が得られます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 71. godoc: <a href="https://pkg.go.dev/go/types#Object">go/types.Object</a></div>
+<div class="title">リスト 74. godoc: <a href="https://pkg.go.dev/go/types#Object">go/types.Object</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Object</span> <span class="k">interface</span> <span class="p">{</span>
     <span class="n">Parent</span><span class="p">()</span> <span class="o">*</span><span class="n">Scope</span> <span class="c">// scope in which this object is declared; nil for methods and struct fields</span>
@@ -3876,7 +4163,7 @@ Usage of [go] doc:
 <p>各サービスは <code>gosrc.service</code> 構造体として表現されます：</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 72. godoc: github.com/golang/gddo/gosrc.service</div>
+<div class="title">リスト 75. godoc: github.com/golang/gddo/gosrc.service</div>
 <div class="content">
 <pre>// go doc github.com/golang/gddo/gosrc.service: 取得できませんでした</pre>
 </div>
@@ -3888,7 +4175,7 @@ Usage of [go] doc:
 <p><code>Directory</code> が主に利用される型となります。これはパッケージのインポートパスやパッケージを構成するファイル名を保持しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 73. godoc: github.com/golang/gddo/gosrc.Directory</div>
+<div class="title">リスト 76. godoc: github.com/golang/gddo/gosrc.Directory</div>
 <div class="content">
 <pre>// go doc github.com/golang/gddo/gosrc.Directory: 取得できませんでした</pre>
 </div>
@@ -3921,7 +4208,7 @@ Usage of [go] doc:
 <div class="sect4">
 <h5 id="例github"><a class="anchor" href="#例github"></a>例：GitHub</h5>
 <div class="listingblock">
-<div class="title">リスト 74. <a href="https://github.com/golang/go/blob/75e3d37/:gddo/gosrc/github.go#L20"><code>github.go:20</code></a></div>
+<div class="title">リスト 77. <a href="https://github.com/golang/go/blob/75e3d37/:gddo/gosrc/github.go#L20"><code>github.go:20</code></a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="n">addService</span><span class="p">(</span><span class="o">&amp;</span><span class="n">service</span><span class="p">{</span>
     <span class="n">pattern</span><span class="o">:</span>         <span class="n">regexp</span><span class="o">.</span><span class="n">MustCompile</span><span class="p">(</span><span class="s">`^github\.com/(?P&lt;owner&gt;[a-z0-9A-Z_.\-]+)/(?P&lt;repo&gt;[a-z0-9A-Z_.\-]+)(?P&lt;dir&gt;/.*)?$`</span><span class="p">),</span>
@@ -3952,7 +4239,7 @@ Usage of [go] doc:
 <p>通常はローカルのファイルシステムに対してファイルの探索を行うのですが、<code>build.Context</code> のファイルシステムへのアクセスに相当するフィールドを書き換えることで</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 75. godoc: <a href="https://pkg.go.dev/go/build#Context">go/build.Context</a></div>
+<div class="title">リスト 78. godoc: <a href="https://pkg.go.dev/go/build#Context">go/build.Context</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Context</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">GOARCH</span> <span class="kt">string</span> <span class="c">// target architecture</span>
@@ -4037,8 +4324,8 @@ Usage of [go] doc:
 </div>
 <div id="footer">
 <div id="footer-text">
-Version af43867<br>
-Last updated 2026-09-28 10:28:11 UTC
+Version 44b5ba8<br>
+Last updated 2026-09-28 14:08:03 UTC
 </div>
 </div>
 </body>
