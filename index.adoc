@@ -18,39 +18,10 @@
 
 include::00-intro.adoc[leveloffset=+1]
 include::01-ast.adoc[leveloffset=+1]
-include::02-comment-and-document.adoc[leveloffset=+1]
-
-== ソースコードの文字列化
-
-WARNING: WIP
-
-- go/printer
-- go/format
-- golang.org/x/tools/go/ast/astutil
-
+include::02-comments.adoc[leveloffset=+1]
+include::03-print.adoc[leveloffset=+1]
 include::04-types.adoc[leveloffset=+1]
-
-== ビルド情報とパッケージの読み込み
-
-WARNING: WIP
-
-- go/build
-- go/build/constraint
-- go/version
-- golang.org/x/tools/go/packages
-
-== 静的解析ツールを作る
-
-WARNING: WIP
-
-- golang.org/x/tools/go/analysis
-
-== フロー解析
-
-WARNING: WIP
-
-- golang.org/x/tools/go/cfg
-- golang.org/x/tools/go/ssa
-- golang.org/x/tools/go/callgraph
-
-include::07-reading-code.adoc[leveloffset=+1]
+include::05-build.adoc[leveloffset=+1]
+include::06-analysis.adoc[leveloffset=+1]
+include::07-flow.adoc[leveloffset=+1]
+include::08-reading.adoc[leveloffset=+1]

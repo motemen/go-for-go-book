@@ -1,0 +1,5 @@
+= 静的解析ツールを作る
+
+WARNING: WIP
+
+- golang.org/x/tools/go/analysis
