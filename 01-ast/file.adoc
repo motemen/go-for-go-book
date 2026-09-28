@@ -6,7 +6,7 @@
 
 まず、Goのソースコードファイルの構造を確認しておきましょう。
 
-https://go.dev/ref/spec#Source_file_organization[The Go Programming Language Specification - Source file organization] によれば、ひとつのファイルの中には
+https://go.dev/ref/spec#Source_file_organization[The Go Programming Language Specification - Source file organization]によれば、ひとつのファイルの中には
 
 1. パッケージ名
 2. `import` 節
@@ -46,7 +46,7 @@ godoc::go/ast.File[]
 
 で解説します。
 
-`Scope` と `Unresolved` は deprecated:1.22[] です。詳しくは<<スコープとオブジェクト>>で解説します。
+`Scope` と `Unresolved` は1.22で非推奨となりました。詳しくは<<ast-object-deprecation>>で解説します。
 
 // Imports は Decls のうち IMPORT なものをフラットに並べてるだけで parser.ImportsOnly なときに便利ってくらい？
 // 5be77a204bee72c81a8f0182d0a23bfd32b36ab9
