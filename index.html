@@ -50,8 +50,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version 44b5ba8,</span>
-<span id="revdate">2026-09-28T23:07:29+09:00</span>
+<span id="revnumber">version 513006e,</span>
+<span id="revdate">2026-09-28T23:21:54+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -322,7 +322,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x3e6a5461c060), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x3e6a5461c080)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x159c9c674080), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x159c9c6740a0)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1349,8 +1349,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x17dc2b38c100), (*ast.Field)(0x17dc2b38c140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x17dc2b38c100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x5741b87e100), (*ast.Field)(0x5741b87e140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x5741b87e100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -1491,18 +1491,7 @@ TODO Names のふるまい方; nil と複数
 <p>型や関数を宣言するときには、その制約とともに型パラメータを指定します。この表記は関数のパラメータや構造体のフィールドと同型なので、同じく <code>ast.FieldList</code> で表されます。<code>ast.TypeSpec</code>、<code>ast.FuncType</code> の持つ <code>TypeParams</code> フィールドがこれにあたります。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 28. godoc: <a href="https://pkg.go.dev/go/ast#FuncType">go/ast.FuncType</a></div>
-<div class="content">
-<pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">FuncType</span> <span class="k">struct</span> <span class="p">{</span>
-    <span class="n">Func</span>       <span class="n">token</span><span class="o">.</span><span class="n">Pos</span>  <span class="c">// position of "func" keyword (token.NoPos if there is no "func")</span>
-    <span class="n">TypeParams</span> <span class="o">*</span><span class="n">FieldList</span> <span class="c">// type parameters; or nil</span>
-    <span class="n">Params</span>     <span class="o">*</span><span class="n">FieldList</span> <span class="c">// (incoming) parameters; non-nil</span>
-    <span class="n">Results</span>    <span class="o">*</span><span class="n">FieldList</span> <span class="c">// (outgoing) results; or nil</span>
-<span class="p">}</span></code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">リスト 29. godoc: <a href="https://pkg.go.dev/go/ast#TypeSpec">go/ast.TypeSpec</a></div>
+<div class="title">リスト 28. godoc: <a href="https://pkg.go.dev/go/ast#TypeSpec">go/ast.TypeSpec</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">TypeSpec</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">Doc</span>        <span class="o">*</span><span class="n">CommentGroup</span> <span class="c">// associated documentation; or nil</span>
@@ -1513,6 +1502,20 @@ TODO Names のふるまい方; nil と複数
     <span class="n">Comment</span>    <span class="o">*</span><span class="n">CommentGroup</span> <span class="c">// line comments; or nil</span>
 <span class="p">}</span></code></pre>
 </div>
+</div>
+<div class="listingblock">
+<div class="title">リスト 29. godoc: <a href="https://pkg.go.dev/go/ast#FuncType">go/ast.FuncType</a></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">FuncType</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="n">Func</span>       <span class="n">token</span><span class="o">.</span><span class="n">Pos</span>  <span class="c">// position of "func" keyword (token.NoPos if there is no "func")</span>
+    <span class="n">TypeParams</span> <span class="o">*</span><span class="n">FieldList</span> <span class="c">// type parameters; or nil</span>
+    <span class="n">Params</span>     <span class="o">*</span><span class="n">FieldList</span> <span class="c">// (incoming) parameters; non-nil</span>
+    <span class="n">Results</span>    <span class="o">*</span><span class="n">FieldList</span> <span class="c">// (outgoing) results; or nil</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Go 1.27で追加されたジェネリックなメソッド（<a href="https://go.dev/doc/go1.27#language" class="bare">https://go.dev/doc/go1.27#language</a>）の型パラメータは、<code>FuncType.TypeParams</code> で表現されます。</p>
 </div>
 <div class="paragraph">
 <p><code>ast.FieldList</code> は複数の <code>ast.Field</code> を持ち、ここでは <code>ast.Field.Names</code> が型パラメータの名前を、<code>ast.Field.Type</code> が型パラメータの制約を表します。型の制約には <code>~int | ~float64</code> のように型の集合を指定できますが、これは <code>ast.UnaryExpr</code>（<code>~</code>）や <code>ast.BinaryExpr</code>（<code>|</code>）として表されます。</p>
@@ -1659,7 +1662,7 @@ TODO Names のふるまい方; nil と複数
 </div>
 </div>
 <div class="sect4">
-<h5 id="インタフェースの制約ast_fieldlist"><a class="anchor" href="#インタフェースの制約ast_fieldlist"></a>インタフェースの制約：ast.FieldList</h5>
+<h5 id="インタフェースの制約ast_fieldlist"><a class="anchor" href="#インタフェースの制約ast_fieldlist"></a>インタフェースの制約：<code>ast.FieldList</code></h5>
 <div class="paragraph">
 <p>型の制約を含むインタフェース（<a href="https://go.dev/ref/spec#General_interfaces">General interfaces</a>）には、メソッドのほかに <code>int</code> や <code>~int | ~float64</code> といった型の集合を書けます。</p>
 </div>
@@ -1729,7 +1732,6 @@ TODO Names のふるまい方; nil と複数
                         }
                     ]
                 }
-                Incomplete: false
             }
         }
     ]
@@ -4324,8 +4326,8 @@ Usage of [go] doc:
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 44b5ba8<br>
-Last updated 2026-09-28 14:08:03 UTC
+Version 513006e<br>
+Last updated 2026-09-28 14:22:15 UTC
 </div>
 </div>
 </body>
