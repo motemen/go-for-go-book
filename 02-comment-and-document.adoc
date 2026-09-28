@@ -67,13 +67,17 @@ Goパッケージの（ソースコードから生成される）ドキュメン
 
 godoc::go/doc.Package[]
 
-`doc.Package` は `doc.New` 関数によって `ast.Package`（-> <<ast-object-deprecation>>）から生成されます。
+`doc.Package` は `doc.NewFromFiles` 関数によって、パッケージを構成するファイルの構文木（`[]*ast.File`）から生成されます。
 
-godoc::go/doc.New[]
+godoc::go/doc.NewFromFiles[]
 
-NOTE: ドキュメントに "`New takes ownership of the AST pkg and may edit or overwrite it.`" とある通り、`doc.New` は与えられた `pkg` を書き換えることがあります。
+ドキュメントを得るには、構文解析の際に `parser.ParseComments` を指定してコメントを構文木に含めておく必要があります。
 
-`mode` パラメータの指定によって、非公開のAPIに関してもドキュメントを収集することができます。
+NOTE: 以前は `doc.New` 関数が使われていましたが、これが引数に取る `ast.Package` はGo 1.22で非推奨となっています（-> <<ast-object-deprecation>>）。また `doc.New` では例示のためのテストが収集されません。
+
+最後の可変長引数 `opts` には、`doc.Mode` 型の値をひとつ与えることができます。これによって非公開のAPIに関してもドキュメントを収集したり（`AllDecls`）、与えた構文木を書き換えないようにしたり（`PreserveAST`）できます。
+
+とくに、`NewFromFiles` のコメントにある通り、`PreserveAST` を指定しない限り `doc.NewFromFiles` は与えられた構文木を書き換えることがあります。
 
 godoc::go/doc.AllDecls[]
 
@@ -88,3 +92,7 @@ WARNING: WIP
 WARNING: WIP
 
 * doc.Examples
+
+== ディレクティブ
+
+WARNING: WIP

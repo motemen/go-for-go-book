@@ -11,7 +11,7 @@ godoc::go/ast.Ident[]
 
 `go/ast` や `go/types` では、term:名前をつけられた言語上の要素[named language entity]をterm:オブジェクト[object]と呼んでおり、構文上のオブジェクトはこの `ast.Object` によって表されています。
 
-たとえば以下のコードにおける `x` のように、同じ名前を持つ識別子でもその指す実体が異なっていることがありますが、それを構文解析の段階で区別しようというものです。
+たとえば以下のコードにおける `x` のように、同じ名前を持つ識別子でもその指す実体が異なっていることがありますが、これらの識別子を構文解析の段階で解決し、区別しようというものです。
 
 [source,go]
 ----
@@ -48,5 +48,15 @@ import "github.com/motemen/go-loghttp" // loghttp という名前が導入され
 上記の問題と、それに起因する利用者の混乱を理由に、link:https://github.com/golang/go/issues/52463[golang/go#52463]で `ast.Object` の非推奨化が決定されました。
 
 Go 1.22で `ast.Object` をはじめとして `ast.Ident.Obj`、`ast.Scope`、`ast.File.Scope`、`ast.File.Unresolved`, `ast.Importer`、`ast.Package`、`ast.NewPackage` が非推奨化されました。
+
+非推奨化されたとはいえ、互換性のため `parser.ParseFile` などはデフォルトでこれまで通り識別子の解決を行い、`ast.Ident.Obj` や `ast.File.Scope` を埋めようとします。
+これらのフィールドを使わないことがほとんどなので、<<parser.Mode>>で紹介した `parser.SkipObjectResolution` フラグを指定して、この処理をスキップすることが推奨されています。
+
+[source,go]
+----
+f, err := parser.ParseFile(fset, filename, src, parser.SkipObjectResolution)
+----
+
+`parser.SkipObjectResolution` 自体はGo 1.17で導入されたもので、名前の解決を型解析に任せるツールにとって不要な処理を省き、構文解析を高速化する目的がありました（link:https://github.com/golang/go/issues/45104[golang/go#45104]）。
 
 またその後のGo 1.25では、`ast.FilterPackage`、`ast.PackageExports`、`ast.MergePackageFiles`、`ast.MergeMode` が非推奨化されています。これらのAPIも、`ast.Object` 関連の機構にのみ依存していたためです（<https://go.dev/doc/go1.25#minor_library_changes>）。

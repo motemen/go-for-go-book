@@ -24,12 +24,29 @@ godoc::go/parser.ParseFile[]
 
 第一引数の `fset` は構文解析によって得られた構文木のノードの詳細な位置情報を保持する `token.FileSet` 構造体へのポインタです。詳しくは<<ソースコード中の位置>>で説明しますが、基本的に `token.NewFileSet()` で得られるものを渡せば十分です。
 
-最後の引数 `mode` では構文解析する範囲の指定などが行えます。後で<<コメントとドキュメント>>を扱うときに少し触れます。
+最後の引数 `mode` では構文解析する範囲の指定などが行えます。これについては次の<<parser.Mode>>で説明します。
 
 goexample::parsefile[]
 goexample::parsefile[output]
 
 例では `src` 変数のもつソースコードを構文解析し、トップレベルの宣言を印字します。今回は `import` 宣言が `*ast.GenDecl` として、関数 `func f` が `*ast.FuncDecl` として得られました。
+
+== parser.Mode
+
+`parser.ParseFile` の最後の引数 `mode` は `parser.Mode` 型の値で、構文解析の挙動をカスタマイズすることができます。
+
+godoc::go/parser.Mode[]
+godoc::go/parser.PackageClauseOnly[]
+
+複数のフラグを指定する場合は `parser.ParseComments|parser.SkipObjectResolution` のようにビット和をとります。
+
+主なフラグは以下の通りです。
+
+`PackageClauseOnly`、`ImportsOnly`:: それぞれパッケージ節、`import` 宣言までを解析したところで構文解析を打ち切ります。
+`ParseComments`:: ソースコード中のコメントも結果に含めます。指定しない場合、コメントは読み捨てられます。<<コメントとドキュメント>>を取り扱うのに必要です。
+`SkipObjectResolution`:: 構文解析の段階で行われる識別子の解決をスキップします。この機能が生成する `ast.Object` などはすでに非推奨となっており、`ParseFile` のドキュメントでもこのフラグの指定が推奨されています。詳しくは<<ast-object-deprecation>>で解説します。
+
+NOTE: `DeclarationErrors` は宣言に関するエラーを報告するフラグとなっていますが、内部では非推奨となった機構を利用しているため（<<ast-object-deprecation>>）、使用しないほうがいいかもしれません。
 
 == ast.File
 
