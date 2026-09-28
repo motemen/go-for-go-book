@@ -40,21 +40,28 @@ godoc::go/ast.File[]
 他にもいろいろなフィールドがありますが、
 
 * `Package` は<<ソースコード中の位置>>、
-* `Scope` と `Unresolved` は<<スコープ>>、
 * `Doc` と `Comments` は<<コメントとドキュメント>>
 
+// TODO: GoVersion について触れる
+
 で解説します。
+
+`Scope` と `Unresolved` は deprecated:1.22[] です。詳しくは<<スコープとオブジェクト>>で解説します。
 
 // Imports は Decls のうち IMPORT なものをフラットに並べてるだけで parser.ImportsOnly なときに便利ってくらい？
 // 5be77a204bee72c81a8f0182d0a23bfd32b36ab9
 
 == 構文木の探索
 
-<<構文ノードのインタフェース>>で述べたように、構文木のノードは `ast` パッケージのインタフェースとして得られます。そのため、具体的な内容を知るにはtype assertionやtype switchを用いなければなりません。これを手で丁寧に書いていくのは大変で間違いも起きがちですが、`ast.Inspect` 関数で構文ノードに対する（深さ優先）探索を行えます。
+<<構文ノードのインタフェース>>で述べたように、構文木のノードは `ast` パッケージのインタフェースとして得られます。構文木を辿っていくにはtype switchなどを用いて具体的な型を判別し、それぞれに応じた処理を行う必要がありますが、このような処理をサポートする関数が `ast` パッケージには用意されています。
 
-godoc::go/ast.Inspect[]
+=== ast.Preorder
 
-`node` から始まり、子ノードを再帰的に探索しつつにコールバック関数 `f` が呼ばれます。子ノードの探索を終えるごとに、引数 `nil` でコールバックが呼ばれます。コールバック関数では `false` を返すことで、そのノードの子供以下への探索を打ち切ることができます。
+`ast.Preorder` 関数をfor rangeループとともに用いることで、構文木のノードを行きがけ順（preorder）深さ優先で辿れます。
+
+godoc::go/ast.Preorder[]
+
+NOTE: 深さ優先探索において、行きがけ順（preorder）では、親ノードを先に訪問し、その後に子ノードを訪問します。
 
 以下は先ほどのソースコードファイル中の識別子を一覧する例です。訪問したノードの具体的な型を知るために、type assertionをおこなっています。
 
@@ -63,4 +70,19 @@ goexample::listidents[output]
 
 パッケージ名（`p`）や変数名（`n`）などの識別子が構文木に含まれていることが確認できます。
 
-NOTE: もうひとつの方法として、`ast.Visitor` インタフェースを実装して `ast.Walk(v ast.Visitor, node ast.Node)` を使うこともできます。実際 `ast.Inspect` の内部では `ast.Walk` が使われています。
+=== ast.PreorderStack
+
+単純にすべてのノードを個別に走査するのではなく、根からそのノードに至るまでのスタックを参照したり、部分木をスキップしたりと、より柔軟な探索をしたい場合には `ast.PreorderStack` が使えます。
+
+godoc::go/ast.PreorderStack[]
+
+`Preorder` と名前は似ていますが形は異っており、コールバックを用います。
+
+コールバック `f` の第二引数 `stack` には、根 `root` からそのノードに至るまでのノードが順に並んでいます。ノード `n` 自身は含まれません。また `f` が `false` を返した場合、そのノードの子孫はスキップされます。
+
+先ほどの識別子を一覧する例を、それぞれの識別子が根からどのようなノードを経て現れるのかも表示するように書き換えてみましょう。
+
+goexample::preorderstack[]
+goexample::preorderstack[output]
+
+NOTE: より低レベルな方法として `ast.Inspect`、`ast.Walk` を使うこともできますが、ここでは紹介しません。とくに `ast.PreorderStack` は `ast.Inspect` でよくある間違いを回避する目的で導入されました（link:https://github.com/golang/go/issues/73319[golang/go#73319]）。

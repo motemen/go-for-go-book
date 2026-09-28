@@ -197,9 +197,9 @@ end
 
 # API が導入されたバージョン、非推奨になったバージョンを示すバッジ
 #
-#   since:go/ast.Preorder[]        => Go 1.23〜（data/goapi.json から引く）
-#   since:1.18[]                   => Go 1.18〜（言語機能など、シンボルがないもの）
-#   since:x/tools@v0.50.0[]        => x/tools v0.50.0〜
+#   since:go/ast.Preorder[]        => Go 1.23で追加（data/goapi.json から引く）
+#   since:1.18[]                   => Go 1.18で追加（言語機能など、シンボルがないもの）
+#   since:x/tools@v0.50.0[]        => x/tools v0.50.0で追加
 #   deprecated:go/ast.Object[]     => Go 1.22 で非推奨（data/goapi.json から引く）
 #   deprecated:1.22[]              => Go 1.22 で非推奨
 #
@@ -274,7 +274,7 @@ class SinceMacro < Asciidoctor::Extensions::InlineMacroProcessor
   def process(parent, target, attrs)
     mod, ver = VersionBadge.label(target, :since)
     return '' if VersionBadge.hidden?(parent, mod, ver)
-    VersionBadge.render(parent, 'since', "#{mod} #{ver}〜")
+    VersionBadge.render(parent, 'since', "#{mod} #{ver}で追加")
   rescue ArgumentError => e
     VersionBadge.logger.warn "since:#{target}[]: #{e.message}"
     ''

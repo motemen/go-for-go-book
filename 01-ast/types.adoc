@@ -166,7 +166,7 @@ NOTE: `ast.Ellipsis` や `ast.KeyValueExpr` のように、それ単体では式
 * https://go.dev/ref/spec#Composite_literals[複合リテラル]（`ast.CompositeLit`）
 * 括弧（`ast.ParenExpr`）
 * セレクタまたは修飾された識別子（`x.y`）（`ast.SelectorExpr`）
-* 添字アクセス（`ast.IndexExpr`）
+* 添字アクセス（`ast.IndexExpr`、`ast.IndexListExpr`）
 * スライス式（`ast.SliceExpr`）
 * 型アサーション（`ast.TypeAssertExpr`）
 * 関数またはメソッド呼び出し（`ast.CallExpr`）
@@ -187,7 +187,7 @@ godoc::go/ast.Ident[]
 
 `ast.Ident` はコード中の識別子を表し、変数名をはじめパッケージ名、ラベルなどさまざまな場所に登場します。
 
-`Obj` フィールドはその実体を表す `ast.Object` への参照になっています。詳しくは <<スコープとオブジェクト>>で触れます。
+`Obj` フィールドが非推奨となっていることについては、<<スコープとオブジェクト>>で触れます。
 
 === ast.StructTypeとast.InterfaceType
 
