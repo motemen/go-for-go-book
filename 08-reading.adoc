@@ -4,10 +4,10 @@
 
 WARNING: FIXME: 全体的に雑
 
-include::07-reading-code/godoc.adoc[leveloffset=+1]
-include::07-reading-code/gofmt.adoc[leveloffset=+1]
-include::07-reading-code/stringer.adoc[leveloffset=+1]
-include::07-reading-code/goimports.adoc[leveloffset=+1]
+include::08-reading/godoc.adoc[leveloffset=+1]
+include::08-reading/gofmt.adoc[leveloffset=+1]
+include::08-reading/stringer.adoc[leveloffset=+1]
+include::08-reading/goimports.adoc[leveloffset=+1]
 
 == guru
 

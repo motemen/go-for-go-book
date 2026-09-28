@@ -1,0 +1,7 @@
+= フロー解析
+
+WARNING: WIP
+
+- golang.org/x/tools/go/cfg
+- golang.org/x/tools/go/ssa
+- golang.org/x/tools/go/callgraph

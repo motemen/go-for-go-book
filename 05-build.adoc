@@ -1,0 +1,8 @@
+= ビルド情報とパッケージの読み込み
+
+WARNING: WIP
+
+- go/build
+- go/build/constraint
+- go/version
+- golang.org/x/tools/go/packages

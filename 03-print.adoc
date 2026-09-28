@@ -1,0 +1,7 @@
+= ソースコードの文字列化
+
+WARNING: WIP
+
+- go/printer
+- go/format
+- golang.org/x/tools/go/ast/astutil
