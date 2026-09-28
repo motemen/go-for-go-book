@@ -1,0 +1,7 @@
+package p
+
+type Map[K comparable, V any] map[K]V
+
+func Sum[T ~int | ~float64](xs []T) T { /* ... */ }
+
+func (l List[T]) Map[U any](f func(T) U) List[U] { /* ... */ }

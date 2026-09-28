@@ -6,8 +6,9 @@ cd "$(dirname "$0")/.."
 status=0
 for dir in $(go list -f '{{if eq .Name "main"}}{{.Dir}}{{end}}' ./examples/...); do
   name=$(basename "$dir")
-  # printinterfacetree は引数が必要なツールなので scripts/gen-listings.sh で確かめる
+  # printinterfacetree と printastcompact は引数が必要なツールなので scripts/gen-listings.sh で確かめる
   [ "$name" = printinterfacetree ] && continue
+  [ "$name" = printastcompact ] && continue
   if go run "$dir" > /dev/null 2>&1; then
     echo "ok   $name"
   else

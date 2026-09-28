@@ -1,0 +1,33 @@
+// func (m Map[K, V]) Empty() bool
+*ast.FuncDecl {
+    Recv: *ast.FieldList {
+        List: [
+            *ast.Field {
+                Names: [m]
+                Type: *ast.IndexListExpr {
+                    X: *ast.Ident { Name: "Map" }
+                    Indices: [
+                        *ast.Ident { Name: "K" }
+                        *ast.Ident { Name: "V" }
+                    ]
+                }
+            }
+        ]
+    }
+    Name: *ast.Ident { Name: "Empty" }
+    Type: *ast.FuncType {}
+}
+
+// var l List[int]
+*ast.GenDecl {
+    Tok: var
+    Specs: [
+        *ast.ValueSpec {
+            Names: [l]
+            Type: *ast.IndexExpr {
+                X: *ast.Ident { Name: "List" }
+                Index: *ast.Ident { Name: "int" }
+            }
+        }
+    ]
+}

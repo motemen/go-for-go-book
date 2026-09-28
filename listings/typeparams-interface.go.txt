@@ -1,0 +1,6 @@
+package p
+
+type Number interface {
+	~int | ~float64
+	String() string
+}

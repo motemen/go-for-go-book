@@ -39,13 +39,13 @@ godoc::go/ast.FuncDecl[]
 
 `Recv` の型である <<ast.FieldList,`*ast.FieldList`>>は識別子と型の組のリストで、関数のパラメータや構造体のフィールドを表すのに使われます。
 
-NOTE: `FieldList` はその名の通り複数の組を表しますが、Goの文法上、レシーバとしてはただ1つの組のみが有効です。が構造体のフィールド宣言の表現などにも使われる `FieldList` が再利用されている形です。
+****
 
-[WARNING]
-====
+`FieldList` はその名の通り複数の組を表しますが、Goの文法上、レシーバとしてはただ1つの組のみが有効です。が構造体のフィールド宣言の表現などにも使われる `FieldList` が再利用されている形です。
+
 上記の事情にも関わらず、`go/parser` は複数の組からなるレシーバをエラーなく解析します！　コメントによると、シンプルさとロバスト性のためだということです。
 
-TODO: なんかいい感じに引用スタイル
+// TODO: なんかいい感じに引用スタイル
 
 .src/go/parser/parser.go
 ----
@@ -56,7 +56,8 @@ treated like an ordinary parameter list and thus may contain multiple
 entries where the spec permits exactly one. Consequently, the corresponding
 field in the AST (ast.FuncDecl.Recv) field is not restricted to one entry.
 ----
-====
+
+****
 
 === ast.GenDecl
 
@@ -157,8 +158,6 @@ https://go.dev/ref/spec#Type_switches
 
 `ast.Expr` インタフェースはおもにGoソースコードにおける https://go.dev/ref/spec#Expressions[式] および https://go.dev/ref/spec#Types[型] に対応する構文木のノードを表します。`go/ast` パッケージの実装では以下のように分類されています：
 
-NOTE: `ast.Ellipsis` や `ast.KeyValueExpr` のように、それ単体では式となり得ないノードも `ast.Expr` を実装していますが、このおかげでこれらを含むノードの実装が簡単になっているようです。
-
 * 識別子（`ast.Ident`）
 * `...`（`ast.Ellipsis`）
 * 基本的な型のリテラル（`ast.BasicLit`）
@@ -180,6 +179,8 @@ NOTE: `ast.Ellipsis` や `ast.KeyValueExpr` のように、それ単体では式
 * インタフェース型（`ast.InterfaceType`）
 * マップ型（`ast.MapType`）
 * チャンネル型（`ast.ChanType`）
+
+NOTE: `ast.Ellipsis` や `ast.KeyValueExpr` のように、それ単体では式となり得ないノードも `ast.Expr` を実装していますが、このおかげでこれらを含むノードの実装が簡単になっているようです。
 
 === ast.Ident
 
@@ -224,14 +225,100 @@ godoc::go/ast.FieldList[]
 
 * `ast.StructType`    ...... 構造体のフィールドのリストとして
 * `ast.InterfaceType` ...... インタフェースのメソッドのリストとして
-* `ast.FuncType`      ...... 関数のパラメータおよび返り値として
+* `ast.FuncType`      ...... 関数の型パラメータ、値パラメータ、返り値として
 * `ast.FuncDecl`      ...... メソッドのレシーバとして
+* `ast.TypeSpec`      ...... 型宣言における型パラメータとして
 
 `ast.Field` の `Tag` は構造体のフィールドである場合のみ存在しえます。
 
 WARNING: TODO Names のふるまい方; nil と複数
 
 // git grep -w Tag src/go/parser; parseStructType -> parseFieldDecl
+
+== 型パラメータの扱い
+
+型パラメータやその制約、型引数は言語仕様では式として定義されてはいませんが、構文木の上では `ast.Expr` として表現されます。これらは、半ば当然のことですが、その意味ではなく、コード上のどの位置に現れるかでその形式が決まります。
+
+[options="header"]
+|===
+|用途 |例 |構文木上の形式
+|制約つきの型パラメータ |`[K comparable, V any]` |`ast.FieldList`
+|型パラメータや具体化 |`List[T]`、`List[int]`、`Map[string, int]` |`ast.IndexExpr`、`ast.IndexListExpr`
+|インタフェースの制約 |`interface{ ~int \| ~float64 }` |`ast.FieldList`
+|===
+
+=== 制約つきの型パラメータ：`ast.FieldList`
+
+型や関数を宣言するときには、その制約とともに型パラメータを指定します。この表記は関数のパラメータや構造体のフィールドと同型なので、同じく `ast.FieldList` で表されます。`ast.TypeSpec`、`ast.FuncType` の持つ `TypeParams` フィールドがこれにあたります。
+
+godoc::go/ast.FuncType[]
+
+godoc::go/ast.TypeSpec[]
+
+`ast.FieldList` は複数の `ast.Field` を持ち、ここでは `ast.Field.Names` が型パラメータの名前を、`ast.Field.Type` が型パラメータの制約を表します。型の制約には `~int | ~float64` のように型の集合を指定できますが、これは `ast.UnaryExpr`（`~`）や `ast.BinaryExpr`（`|`）として表されます。
+
+以下の型、関数、メソッドの宣言を解析すると、それぞれ次のようになります。
+
+[source,go]
+----
+include::../listings/typeparams-decl.go.txt[lines=3..]
+----
+
+----
+include::../listings/typeparams-decl.ast.txt[]
+----
+
+=== 型パラメータや具体化：`ast.IndexExpr` と `ast.IndexListExpr`
+
+ジェネリックな型のメソッドのレシーバ（`func (m Map[K, V]) Empty() bool`）や型の具体化（`List[int]` や `Map[string, int]`）は、構文木の上では `ast.IndexExpr` もしくは `ast.IndexListExpr` として表されます。
+
+構文木を確認してみましょう。
+
+[source,go]
+----
+include::../listings/typeparams-index.go.txt[lines=3..]
+----
+
+----
+include::../listings/typeparams-index.ast.txt[]
+----
+
+****
+
+型の具体化 `List[int]` も配列の添字アクセス `a[0]` も、構文木の上ではどちらも `ast.IndexExpr` で、区別がつきません。`X[Y]` が具体化なのか添字アクセスなのかを知るには型の情報が必要です（-> <<型解析>>）。
+
+****
+
+=== インタフェースの制約：ast.FieldList
+
+型の制約を含むインタフェース（link:https://go.dev/ref/spec#General_interfaces[General interfaces]）には、メソッドのほかに `int` や `~int | ~float64` といった型の集合を書けます。
+
+これも `ast.FieldList` のエントリとして表され、ジェネリクス登場以前から存在していた `ast.InterfaceType.Methods` フィールドの中に含まれます。
+
+godoc::go/ast.InterfaceType[]
+
+エントリである `ast.Field` では、インタフェースのメソッドは `Names` がその名前、`Type` が `ast.FuncType` として表され、型の集合においては `Names` が空、`Type` が制約を表わす式で表現されます。
+
+[source,go]
+----
+include::../listings/typeparams-interface.go.txt[lines=3..]
+----
+
+----
+include::../listings/typeparams-interface.ast.txt[]
+----
+
+****
+
+ジェネリクスとともに導入された `~` が単項演算子として扱われているため、`var y = ~1` のような不正な式も構文解析は通ります。また、型の集合を含むインタフェースを `var x interface{ ~int }` のように普通の型として使った場合も、構文解析は通ります。これらをエラーとするのは型チェッカーの役割です（-> <<型解析>>）。
+
+[source,go]
+----
+var y = ~1              // 型チェックで cannot use ~ outside of interface or type constraint (use ^ for bitwise complement)
+var x interface{ ~int } // 型チェックで cannot use type interface{~int} outside a type constraint: interface contains type constraints
+----
+
+****
 
 [appendix]
 == ast.Nodeの階層

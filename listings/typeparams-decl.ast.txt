@@ -1,0 +1,64 @@
+// type Map[K comparable, V any] map[K]V
+*ast.GenDecl {
+    Tok: type
+    Specs: [
+        *ast.TypeSpec {
+            Name: *ast.Ident { Name: "Map" }
+            TypeParams: *ast.FieldList {
+                List: [
+                    *ast.Field {
+                        Names: [K]
+                        Type: *ast.Ident { Name: "comparable" }
+                    }
+                    *ast.Field { Names: [V], Type: *ast.Ident { Name: "any" } }
+                ]
+            }
+            Type: *ast.MapType {
+                Key: *ast.Ident { Name: "K" }
+                Value: *ast.Ident { Name: "V" }
+            }
+        }
+    ]
+}
+
+// func Sum[T ~int | ~float64](xs []T) T
+*ast.FuncDecl {
+    Name: *ast.Ident { Name: "Sum" }
+    Type: *ast.FuncType {
+        TypeParams: *ast.FieldList {
+            List: [
+                *ast.Field {
+                    Names: [T]
+                    Type: *ast.BinaryExpr {
+                        X: *ast.UnaryExpr { Op: ~, X: *ast.Ident { Name: "int" } }
+                        Op: |
+                        Y: *ast.UnaryExpr { Op: ~, X: *ast.Ident { Name: "float64" } }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+// func (l List[T]) Map[U any](f func(T) U) List[U]
+*ast.FuncDecl {
+    Recv: *ast.FieldList {
+        List: [
+            *ast.Field {
+                Names: [l]
+                Type: *ast.IndexExpr {
+                    X: *ast.Ident { Name: "List" }
+                    Index: *ast.Ident { Name: "T" }
+                }
+            }
+        ]
+    }
+    Name: *ast.Ident { Name: "Map" }
+    Type: *ast.FuncType {
+        TypeParams: *ast.FieldList {
+            List: [
+                *ast.Field { Names: [U], Type: *ast.Ident { Name: "any" } }
+            ]
+        }
+    }
+}

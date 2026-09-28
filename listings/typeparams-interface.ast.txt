@@ -1,0 +1,45 @@
+// type Number interface {
+// 	~int | ~float64
+// 	String() string
+// }
+*ast.GenDecl {
+    Tok: type
+    Specs: [
+        *ast.TypeSpec {
+            Name: *ast.Ident { Name: "Number" }
+            Type: *ast.InterfaceType {
+                Methods: *ast.FieldList {
+                    List: [
+                        *ast.Field {
+                            Type: *ast.BinaryExpr {
+                                X: *ast.UnaryExpr {
+                                    Op: ~
+                                    X: *ast.Ident { Name: "int" }
+                                }
+                                Op: |
+                                Y: *ast.UnaryExpr {
+                                    Op: ~
+                                    X: *ast.Ident { Name: "float64" }
+                                }
+                            }
+                        }
+                        *ast.Field {
+                            Names: [String]
+                            Type: *ast.FuncType {
+                                Params: *ast.FieldList {}
+                                Results: *ast.FieldList {
+                                    List: [
+                                        *ast.Field {
+                                            Type: *ast.Ident { Name: "string" }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+                Incomplete: false
+            }
+        }
+    ]
+}
