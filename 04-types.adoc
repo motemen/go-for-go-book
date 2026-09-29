@@ -37,9 +37,19 @@ goexample::typechecksimple[output]
 
 このように、型チェックおよび型情報の取得は `Config` 構造体をエントリポイントとしてパッケージごとに行います。結果は <<types.Package>> 構造体と、ここでは登場しませんでしたが <<types.Info>> 構造体に格納されます。
 
+== types.Config
+
+`types.Config` 構造体が `go/types` パッケージのエントリポイントとなります。
+
+godoc::go/types.Config[]
+
+各フィールドを調整することで、`Check()` による型チェックを行う際の挙動をカスタマイズできます。
+
+特に、`Error func(err error)` は型チェックの際に生じたエラーを全て受け取るコールバックとして便利です。これが `nil` である場合、最初のエラーが起きた時点で型チェックが停止します。
+
 == パッケージのインポート
 
-先ほどの例では `Config.Importer` を設定していました。これは `types.Importer` という型を持つフィールドです。プログラムの型チェックを行うためにはインポートしているパッケージがどんな名前と型を提供するのか知る必要があるため、`Config` 構造体の `Importer` フィールドという形でその実装を指定します。
+`types.Config.Importer` は、`types.Importer` という型を持つフィールドです。プログラムの型チェックを行うためにはインポートしているパッケージがどんな名前と型を提供するのか知る必要があるため、`Config` 構造体の `Importer` フィールドという形でその実装を指定します。
 
 godoc::go/types.Importer[]
 
@@ -90,16 +100,6 @@ goexample::importergolist[output]
 
 標準ではないパッケージの情報を読み取り、型情報を導けています。
 
-== types.Config
-
-`types.Config` 構造体が `go/types` パッケージのエントリポイントとなります。
-
-godoc::go/types.Config[]
-
-各フィールドを調整することで、`Check()` による型チェックを行う際の挙動をカスタマイズできます。
-
-特に、`Error func(err error)` は型チェックの際に生じたエラーを全て受け取るコールバックとして便利です。これが `nil` である場合、最初のエラーが起きた時点で型チェックが停止します。
-
 == 型チェックのエラー
 
 型チェック時のエラーは `types.Error` 構造体によって表現されます。
@@ -111,30 +111,57 @@ godoc::go/types.Error[]
 * `import` されたパッケージが使用されていない
 * 定義された変数が使用されていない
 * ラベルが利用されていない・重複している
+* `goto` がジャンプ先までの間の変数宣言を飛び越えている
 * `:=` の左辺に新しい変数が登場していない
 * `init` 関数の本体が存在しない
+* 型パラメータを持つ関数の本体が存在しない
 // 関数の本体については https://go.dev/ref/spec#Function_declarations
+* `init` 関数や `main` パッケージの `main` 関数が型パラメータ・引数・戻り値を持っている
 * C形式の `for` 文の後処理文で変数を定義しようとしている +
   …… `for i := 0; i < 10; i, j := i+1, i {` のような形。構文解析の時点では受けつけてしまいます
 // parseSimpleStmt。spec でも "PostStmt = SimpleStmt ." となってる
+* `range` で反復できない値に `range` を使っている、または反復変数の数が多すぎる
+* 最後のパラメータ以外で可変長引数の `...` を使っている
+* 型引数が型パラメータの制約を満たしていない
+* 型制約でしか使えないインタフェース（`comparable` や型の集合を含むもの）を通常の型として使っている
+* 型制約の和が重複している（`~int | ~int` など）
+* 型パラメータの値を組み込み関数 `real`・`imag`・`complex` に渡している
+// go.dev/issue/50937
 
 // TODO: 型チェックだけでなくこういう言語的なチェックも行われること初めの方で言及
 
 ////
-% pt --nogroup -w softErrorf src/go/types
-src/go/types/labels.go:38:			check.softErrorf(lbl.pos, "label %s declared but not used", lbl.name)
-src/go/types/labels.go:136:					check.softErrorf(lbl.pos, "label %s already declared", name)
-src/go/types/labels.go:151:							check.softErrorf(
-src/go/types/errors.go:89:func (check *Checker) softErrorf(pos token.Pos, format string, args ...interface{}) {
-src/go/types/resolver.go:356:							check.softErrorf(obj.pos, "missing function body")
-src/go/types/resolver.go:456:						check.softErrorf(obj.pos, "%q imported but not used", path)
-src/go/types/resolver.go:458:						check.softErrorf(obj.pos, "%q imported but not used as %s", path, obj.name)
-src/go/types/resolver.go:468:			check.softErrorf(pos, "%q imported but not used", pkg.path)
-src/go/types/assignments.go:329:		check.softErrorf(pos, "no new variables on left side of :=")
-src/go/types/stmt.go:62:			check.softErrorf(v.pos, "%s declared but not used", v.name)
-src/go/types/stmt.go:565:				check.softErrorf(lhs.Pos(), "no new variable on left side of :=")
-src/go/types/stmt.go:644:				check.softErrorf(lhs.Pos(), "%s declared but not used", lhs.Name)
-src/go/types/stmt.go:710:			check.softErrorf(s.Pos(), "cannot declare in post statement")
+% go version
+go version go1.27.1 darwin/arm64
+% grep -rn "softErrorf(\|err.soft = true" go/types/*.go | grep -v _test | grep -v "func (check"
+go/types/assignments.go:599:		check.softErrorf(pos, NoNewVar, "no new variables on left side of :=")
+go/types/builtins.go:1118:		check.softErrorf(x, code, "%s not supported as argument to built-in %s for go1.18 (see go.dev/issue/50937)", x, predeclaredFuncs[id].name)
+go/types/errors.go:249:	err.soft = true
+go/types/call.go:163:			check.softErrorf(atPos(pos), InvalidTypeArg, "%s", err)
+go/types/decl.go:783:		check.softErrorf(fdecl.Name, BadDecl, "generic function is missing function body")
+go/types/labels.go:44:			check.softErrorf(lbl, UnusedLabel, "label %s declared and not used", lbl.name)
+go/types/labels.go:136:					err.soft = true
+go/types/labels.go:153:							check.softErrorf(
+go/types/range.go:73:			check.softErrorf(&x, InvalidRangeExpr, "cannot range over %s: %s", &x, cause)
+go/types/range.go:75:			check.softErrorf(&x, InvalidRangeExpr, "cannot range over %s", &x)
+go/types/range.go:77:			check.softErrorf(sKey, InvalidIterVar, "range over %s permits no iteration variables", &x)
+go/types/range.go:79:			check.softErrorf(sValue, InvalidIterVar, "range over %s permits only one iteration variable", &x)
+go/types/range.go:81:			check.softErrorf(sExtra, InvalidIterVar, "range clause permits at most two iteration variables")
+go/types/range.go:176:					check.softErrorf(lhs, InvalidRangeExpr, "cannot use iteration variable of type %s", x.typ())
+go/types/signature.go:415:				check.softErrorf(t, InvalidSyntaxTree, "invalid use of ...")
+go/types/resolver.go:420:							check.softErrorf(tparam0, code, "func %s must have no type parameters", name)
+go/types/resolver.go:424:							check.softErrorf(d.decl.Name, code, "func %s must have no arguments and no return values", name)
+go/types/resolver.go:434:							check.softErrorf(obj, MissingInitBody, "func init must have a body")
+go/types/resolver.go:730:		check.softErrorf(obj, UnusedImport, "%q imported and not used", path)
+go/types/resolver.go:732:		check.softErrorf(obj, UnusedImport, "%q imported as %s and not used", path, obj.name)
+go/types/stmt.go:72:		check.softErrorf(v, UnusedVar, "declared and not used: %s", v.name)
+go/types/stmt.go:707:				check.softErrorf(lhs, NoNewVar, "no new variable on left side of :=")
+go/types/stmt.go:782:				check.softErrorf(lhs, UnusedVar, "%s declared and not used", lhs.Name)
+go/types/stmt.go:848:			check.softErrorf(s, InvalidPostDecl, "cannot declare in post statement")
+go/types/typexpr.go:168:					check.softErrorf(e, MisplacedConstraintIface, "cannot use type %s outside a type constraint: interface is (or embeds) comparable", typ)
+go/types/typexpr.go:170:					check.softErrorf(e, MisplacedConstraintIface, "cannot use type %s outside a type constraint: interface contains type constraints", typ)
+go/types/typexpr.go:449:				check.softErrorf(atPos(pos), InvalidTypeArg, "%v", err)
+go/types/union.go:131:				check.softErrorf(tlist[i], InvalidUnion, "overlapping terms %s and %s", t, terms[j])
 ////
 
 以下で、ソフトなエラーとそうでない重篤なエラーの例を確認できます。
@@ -159,27 +186,58 @@ goexample::typechecknameandpath[]
 
 goexample::typechecknameandpath[output]
 
-== typesにおけるスコープ
+== スコープ
 
-`Path` や `Name` などの基本的な情報の他に有用なのは、解析されたパッケージのスコープ情報でしょう。
+`types.Package` 構造体において `Path` や `Name` などの基本的な情報の他に有用なのは、解析されたパッケージのスコープ情報でしょう。
+
+Goのソースコードに登場する名前はレキシカルスコープを持ち、その有効範囲は静的に決まります。型チェックの過程では、このスコープにしたがって、ソースコード中の識別子がどの宣言に由来するものであるかを解決します。
+
+=== スコープを形成するブロック
+
+Goのスコープはブロックにもとづいて作られます。ブレース（`{ ... }`）による明示的なブロックのほかにも、暗黙に作られるブロックがあります。link:https://go.dev/ref/spec#Blocks[Blocks]およびlink:https://go.dev/ref/spec#Declarations_and_scope[Declarations and scope - The Go Programming Language Specification]に述べられていますが、重要な部分を抄訳します：
+
+* 暗黙のユニバースブロック（universe block）は、すべてのソースコードを含みます。あらかじめ宣言された名前（`int` や `nil`、`len` など）はここに属します。
+* パッケージは暗黙のパッケージブロック（package block）を持ち、パッケージを構成するすべてのソースコードを含みます。トップレベルに宣言された定数、型、変数、関数（メソッドを除く）の名前はここに属します。
+* ファイルは暗黙のファイルブロック（file block）を持ち、ひとつのファイルのソースコードを含みます。インポートされたパッケージの名前はここに属します。
+* `if`、`for`、`switch` 文はそれ自身が暗黙のブロックを作ります。`switch` や `select` の各節（case）も同様です。
+
+=== types.Scope
+
+`types` パッケージでは、スコープを `types.Scope` 構造体で表現します。パッケージ全体のスコープ（パッケージブロックに対応するもの）は `types.Package` の `Scope()` メソッドで得られます。
 
 godoc::go/types.Package.Scope[]
 
 godoc::go/types.Scope[]
 
-`types.Scope` 構造体は型におけるスコープを表します。スコープは基本的に、そこに所属する名前から、それが表すオブジェクト（-> <<typesにおけるオブジェクト>>）へのマッピングであると考えられます。
+`Scope` 構造体のメンバーは公開されておらず、メソッドでその内容に問い合わせる必要があります。
 
-スコープは階層構造になっていて、`Parent()` および `Child()` メソッドによりその親（ひとつ外側のスコープ）や子にアクセスできます。
+スコープは大雑把にいうと、名前からそれが表すシンボル（<<オブジェクト>>、後述）へのマッピングです。`Names()` でスコープ内の名前の一覧を、`Lookup()` で名前に対応するオブジェクトを得られます。
+
+godoc::go/types.Scope.Names[]
+
+godoc::go/types.Scope.Lookup[]
+
+また、スコープ同士は入れ子による木構造をつくります。`Parent()` および `Children()` メソッドにより、その親（ひとつ外側のスコープ）や子にアクセスできます。
 
 godoc::go/types.Scope.Parent[]
 
-godoc::go/types.Scope.Child[]
+godoc::go/types.Scope.Children[]
 
-// ast.Scope との対応はどんなもん
+以下の例では、パッケージのスコープから子スコープを再帰的にたどり、スコープ内のオブジェクトを印字します。
+
+goexample::typesscopetree[]
+
+goexample::typesscopetree[output]
+
+// ちなみにデバッグ情報を Scope.String() からしか取り出せないのは `gofind 'go/types.Scope.comment' go/types` で確認できる。
+
+パッケージのスコープの下にファイルのスコープがあり、さらにその下に関数や `for` 文によるスコープが連なっています。
+
+// TODO: token.Pos を使うメソッドも紹介する
 
 === ユニバーススコープ
 
-最も外側のスコープをユニバーススコープと呼ぶことは前に述べたとおりですが、`ast` パッケージと違い `types` パッケージにはこれが定義されています。
+最も外側にあるユニバースブロックのスコープは、`types.Universe` として定義されています。
 
 以下の例では、ユニバーススコープに定義されている名前を列挙しています。
 
@@ -189,13 +247,17 @@ goexample::typesuniverse[output]
 
 組み込みの関数や型がユニバーススコープに属していることが分かります。
 
-== typesにおけるオブジェクト
+== オブジェクト
 
-`types` パッケージにおけるオブジェクトは、`ast` パッケージにおけるそれと異なり、インタフェースとして表現されています。また、より詳しい情報を持ちます。
+`go/types` では、名前解決によって識別子（`ast.Ident`）と対応づけられたシンボルまたはterm:名前をつけられた言語上の要素[named language entity]をterm:オブジェクト[object]と呼んでいます。このオブジェクトは名前や型、その実体の情報を持ちます。<<スコープ>>が名前から引くのはこのオブジェクトです。
+
+オブジェクトは `types.Object` インタフェースとして表現されています。
 
 godoc::go/types.Object[]
 
-`ast.Object` における `Kind` フィールドに対応するものを持たないため、type switchでその種類を判別することになります。typesパッケージで表現されるオブジェクトの種類と、対応するデータ型は以下のようになっています。
+`Name()` や `Pos()` でオブジェクトの名前や宣言された位置を、`Type()` でその型を、`Parent()` でそのオブジェクトが宣言されたスコープを得られます。
+
+オブジェクトの種類は `types.Object` を実装する具体的なデータ型によって区別されます。`types` パッケージで表現されるオブジェクトの種類と、対応するデータ型は以下のようになっています。
 
 * 組み込み関数（`*types.Builtin`）
 * 定数（`*types.Const`）
@@ -205,6 +267,7 @@ godoc::go/types.Object[]
 * インポートされたパッケージ（`*types.PkgName`）
 * 宣言された型（`*types.TypeName`）
 * 宣言された変数など（`*types.Var`）
+// ^ などってのは struct field も含むから
 
 これらについて、以下で見ていきます。
 

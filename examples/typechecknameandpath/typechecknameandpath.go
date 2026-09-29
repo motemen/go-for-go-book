@@ -3,28 +3,27 @@ package main
 import (
 	"fmt"
 	"go/ast"
+	"go/build"
 	"go/importer"
 	"go/parser"
 	"go/token"
 	"go/types"
 	"path/filepath"
-	"runtime"
 )
 
 func main() {
 	path := "cmd/cover"
 
+	bPkg, _ := build.Import(path, "", 0)
+
 	fset := token.NewFileSet()
-	aPkgs, _ := parser.ParseDir(fset, filepath.Join(runtime.GOROOT(), "src", path), nil, parser.Mode(0))
+	files := []*ast.File{}
+	for _, name := range bPkg.GoFiles {
+		f, _ := parser.ParseFile(fset, filepath.Join(bPkg.Dir, name), nil, parser.Mode(0))
+		files = append(files, f)
+	}
 
 	conf := types.Config{Importer: importer.Default()}
-
-	for _, aPkg := range aPkgs {
-		files := []*ast.File{}
-		for _, f := range aPkg.Files {
-			files = append(files, f)
-		}
-		pkg, _ := conf.Check(path, fset, files, nil)
-		fmt.Printf("path=%v name=%v\n", pkg.Path(), pkg.Name())
-	}
+	pkg, _ := conf.Check(path, fset, files, nil)
+	fmt.Printf("path=%v name=%v\n", pkg.Path(), pkg.Name())
 }
