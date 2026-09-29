@@ -1,6 +1,6 @@
 = 型解析
 
-ここまで見てきたようなGoの抽象構文木を扱うAPIを知っていれば、Goプログラムを対象にしてできることの7割ほどは実現できたも同然です。しかし、
+ここまで見てきたようなGoの抽象構文木を扱うAPIを知っていれば、Goプログラムの静的な操作はある程度
 
 * ソースコード中に登場する名前が定義された位置や、
 * ある型がインタフェースを実装しているか
@@ -39,23 +39,56 @@ goexample::typechecksimple[output]
 
 == パッケージのインポート
 
-先ほどの例では `Config.Importer` を設定していました。これは `types.Importer` という型を持つフィールドです。
+先ほどの例では `Config.Importer` を設定していました。これは `types.Importer` という型を持つフィールドです。プログラムの型チェックを行うためにはインポートしているパッケージがどんな名前と型を提供するのか知る必要があるため、`Config` 構造体の `Importer` フィールドという形でその実装を指定します。
 
 godoc::go/types.Importer[]
 
-`types.Importer` は、パッケージのパスを解決し、そのパッケージに関する型レベルの情報を返すインタフェースです。具体的には、コンパイルされたパッケージオブジェクトを `GOPATH` から探し出し、解析するのが仕事です。
+`types.Importer` は、パッケージのパスを解決し、そのパッケージに関する型レベルの情報を返すインタフェースです。
 
-この具体的な実装を提供するのが `go/importer` パッケージです。`importer.Default()` は実行中のバイナリのコンパイラ（`runtime.Compiler`）に対応するインポートの実装を返します。
+=== go/importer
+
+この具体的な実装を提供していたが `go/importer` パッケージ**でした**。
+
+でした、というのは、このパッケージはlink:++https://pkg.go.dev/cmd/go#hdr-Modules__module_versions__and_more++[Go modules]のリリース前につくられたもので、現在の標準的なモジュール管理方法であるGo modulesに対応していないためです。
+
+このモジュールは非推奨とはなっていないものの、上記の理由により、外部のモジュールに依存するようなプログラムに対しては使うべきではないとされています。
+
+インポートの解決に限らず、型解析には `golang.org/x/tools/go/packages` パッケージの利用が推奨されますが、ここで少々 `go/importer` について触れておきます。
+
+==== importer.Default
+
+`importer.Default()` は実行中のバイナリのコンパイラに対応するインポートの簡易な実装を返します。先述の通りGo modulesに対応しておらず、モジュールを `GOPATH` から読み込もうとするため、利用する機会はほとんどないでしょう。
 
 godoc::go/importer.Default[]
 
-以下はパッケージを読み込み、そのパッケージが公開している名前および依存しているパッケージの情報を印字する例です。
+以下は `log` パッケージを読み込み、そのパッケージが公開している名前および依存しているパッケージの情報を印字する例です。
 
 goexample::importer[]
-
 goexample::importer[output]
 
-プログラムの型チェックにはインポートしているパッケージがどんな名前と型を提供するのか知る必要があるため、`Config` 構造体の `Importer` フィールドという形でその実装を指定します。
+==== importer.ForCompiler
+
+どちらにしろ利用が推奨されないパッケージではありますが、`token.FileSet` を渡すことができ、位置情報を正確に扱えるこちらのほうが `Default` よりよいとされています。
+
+godoc::go/importer.ForCompiler[]
+
+第2引数の `compiler` は使用するコンパイラを指定します。通常は `runtime.Compiler` つまり `"gc"` を指定します。
+
+NOTE: Go 1.27時点では、`runtime.Compiler` の値は `"gc"` か `"gccgo"` のいずれかになりますが、実用的には `"gc"` のみだと考えて問題ないでしょう。
+
+第3引数の `lookup` は、パッケージのパスを受け取り、そのパッケージのコンパイル済みファイルを返す関数です。
+
+godoc::go/importer.Lookup[]
+
+このファイルに含まれるエクスポートデータ（<https://go.dev/src/cmd/compile/README#7a-export>）はコンパイラによって生成され、パッケージがエクスポートする宣言の型情報などが含まれています。
+
+具体的には、`go list -export <pkg>` で取得できるファイルになります。
+このことを使って、自前でモジュールシステムに対応した `Importer` を実装できます。
+
+goexample::importergolist[]
+goexample::importergolist[output]
+
+標準ではないパッケージの情報を読み取り、型情報を導けています。
 
 == types.Config
 
