@@ -331,11 +331,73 @@ NOTE: ファイル先頭の `package` 節で指定された名前はスコープ
 
 === types.TypeName
 
-WARNING: TBD
+名前をつけられた型を表します。具体的には、以下のいずれかに対応します。
+
+* 定義された型（`types.Named`）… `type T struct{}` など
+* 型エイリアス（`types.Alias`）… `type A = T` など
+* 型パラメータ（`types.TypeParam`）… `func F[P any]()` の `P`
+* あらかじめ宣言された型 … `int` や `error` など
+
+`TypeName` が表す型は、`Type()` メソッドで得られる `types.Type` になります。以下のサンプルコードで、「あらかじめ宣言された型」がそれぞれどのように表現されているか確認します。
+
+goexample::typesuniversetypename[]
+goexample::typesuniversetypename[output]
+
+ここから、いくつかのことが見てとれます。
+
+* `any` は `interface{}` のエイリアスです。
+* `comparable` は `interface{ comparable }` に名前をつけたもの、という扱いです。循環参照みたいですが、参照先は「内部的にcomparableフラグが立っている」ようなインタフェースとして表現されています。
+// ^ defPredeclaredTypes
+* `error` は `interface{ Error() string }` に名前をつけたものです。
+* `byte` と `rune` はエイリアスだとみなされますが、その表現は `types.Basic` です。実際、それぞれ `uint8` と `int32` と同じ属性を持ち、別の名前を持つ型として表現されています。
+// ^ basicAliases
+
+// 型エイリアスは since 1.22
 
 === types.Var
 
-WARNING: TBD
+宣言された変数を表します。ここでいう変数には、`var` や `:=` によって定義された変数のほか、以下も含まれます。
+
+* 関数のパラメータ・戻り値
+* メソッドのレシーバ
+* 構造体のフィールド
+
+これらのうちどれであるかは、`Kind()` メソッドが返す `types.VarKind` で区別できます。
+
+godoc::go/types.PackageVar[]
+
+==== フィールドを表すオブジェクト
+
+構造体のフィールドを表す `Var` については、以下のメソッドでフィールドとしての情報を得られます。
+
+`IsField()` は、その `Var` が構造体のフィールドであるかどうかを返します。`Kind()` を `types.FieldVar` と比較することへのショートカットです。
+
+godoc::go/types.Var.IsField[]
+
+`Embedded()` は、その `Var` が埋め込みフィールドであるかどうかを返します。同じ挙動の `Anonymous()` もありますが、後方互換性のためだけに残されているので、新しく書くコードでは `Embedded()` を使いましょう。
+
+godoc::go/types.Var.Embedded[]
+
+以下の例では、構造体 `S` のフィールドについて、その名前と型、`Embedded()` の結果を印字しています。
+
+goexample::typesvarembedded[]
+goexample::typesvarembedded[output]
+
+==== 型パラメータのインスタンス化によって生成されるオブジェクト
+
+ジェネリックな型や関数をインスタンス化すると、型パラメータに依存するフィールドや引数を表す `Var` は、具体化された新しいオブジェクトとして生成されます。
+
+このようにして合成された `Var` は対応するソースコード上の定義が存在しませんが、`Origin()` メソッドを使うことで、そのもとになった `Var` を得られます。
+
+godoc::go/types.Var.Origin[]
+
+以下で、インスタンス化されたジェネリックな型 `Gen[string]` のフィールドやメソッドの引数がどのように `Var` として表現されるかを確認します。
+
+goexample::typesvarorigin[]
+
+goexample::typesvarorigin[output]
+
+// TODO: Func.Origin() も同様。型パラメータの節を書くときに合わせて触れる
 
 == types.Info
 
