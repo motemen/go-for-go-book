@@ -50,8 +50,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version 3a40c9d,</span>
-<span id="revdate">2026-10-02T09:22:43+09:00</span>
+<span id="revnumber">version f3bec22,</span>
+<span id="revdate">2026-10-03T00:31:16+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -157,6 +157,13 @@ if (!/\blocalhost\b/.test(location.host)) {
 <li><a href="#型の情報">4.9. 型の情報</a>
 <ul class="sectlevel3">
 <li><a href="#types_type">4.9.1. types.Type</a></li>
+</ul>
+</li>
+<li><a href="#ジェネリクス">4.10. ジェネリクス</a>
+<ul class="sectlevel3">
+<li><a href="#型パラメータ">4.10.1. 型パラメータ</a></li>
+<li><a href="#制約と型集合">4.10.2. 制約と型集合</a></li>
+<li><a href="#オブジェクトのインスタンス化">4.10.3. オブジェクトのインスタンス化</a></li>
 </ul>
 </li>
 <li><a href="#types_objectの階層">Appendix B: types.Objectの階層</a></li>
@@ -328,7 +335,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x254c23c18040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x254c23c18060)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x1b18a1034040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x1b18a1034060)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1355,8 +1362,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x2fb15de04100), (*ast.Field)(0x2fb15de04140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x2fb15de04100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x3f2ec2d02100), (*ast.Field)(0x3f2ec2d02140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x3f2ec2d02100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -3329,7 +3336,7 @@ const (
 <p>以下で、それぞれの場合（トップレベルの関数 <code>F</code>、型 <code>*T</code> のメソッド <code>F</code>、インタフェース <code>I</code> のメソッド <code>F</code>）の出現を確認しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 73. typesfunc.go <span class="icon"><a class="image" href="https://go.dev/play/p/jO77omVeV8" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 73. typesfunc.go <span class="icon"><a class="image" href="https://go.dev/play/p/mIqamLkV3T7" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -3358,8 +3365,12 @@ const (
     <span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
 
     <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">objF</span><span class="p">)</span>
-    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">objT</span><span class="o">.</span><span class="n">Type</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Named</span><span class="p">)</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>                  <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">objT</span><span class="o">.</span><span class="n">Type</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Named</span><span class="p">)</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">0</span><span class="p">))</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="c">//          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~</span>
+    <span class="c">//                    type T           func (*T).F()</span>
     <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">objI</span><span class="o">.</span><span class="n">Type</span><span class="p">()</span><span class="o">.</span><span class="n">Underlying</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Interface</span><span class="p">)</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">0</span><span class="p">))</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="c">//          ~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~</span>
+    <span class="c">//             type I          interface { F() }         func I.F()</span>
 <span class="p">}</span>
 
 <span class="k">var</span> <span class="n">src</span> <span class="o">=</span> <span class="s">`package p
@@ -3400,7 +3411,13 @@ func (path/to/pkg.I).F()</pre>
 </table>
 </div>
 <div class="paragraph">
-<p>インタフェースの抽象メソッドと、それ以外の具象メソッドに対応するオブジェクトへアクセスする方法は微妙に異なりますが、これはあとの節で詳しく触れます。</p>
+<p>このように、インタフェースの抽象メソッドと、それ以外の具象メソッドに対応するオブジェクトへアクセスする方法は微妙に異なります。</p>
+</div>
+<div class="paragraph">
+<p>関数やメソッドの持つ型は、<code>types.Signature</code> として表現され、これが関数のレシーバ・パラメータや戻り値、型パラメータなどの情報を保持します。</p>
+</div>
+<div class="paragraph">
+<p>型パラメータを持つ関数（<code>func F[T any](x T)</code>）や、ジェネリックな型のメソッド（<code>func (Gen[T]) Meth(argT T)</code>）も <code>Func</code> として表現されます。また、ジェネリックな型のインスタンス化にともなって合成される <code>Func</code> もあります。これらについては<a href="#ジェネリクス">ジェネリクス</a>で詳しく扱います。</p>
 </div>
 </div>
 <div class="sect3">
@@ -3593,7 +3610,7 @@ uintptr      *types.Basic     IsAlias=false</pre>
 </ul>
 </div>
 <div class="paragraph">
-<p>これらのうちどれであるかは、<code>Kind()</code> メソッドが返す <code>types.VarKind</code> で区別できます。</p>
+<p>これらのうちのいずれであるかは、<code>Kind</code> <span class="version-badge version-badge-since">Go 1.25で追加</span> メソッドが返す <code>types.VarKind</code> で区別できます。</p>
 </div>
 <div class="listingblock">
 <div class="title">リスト 76. godoc: <a href="https://pkg.go.dev/go/types#PackageVar">go/types.PackageVar</a> <span class="version-badge version-badge-since">Go 1.25で追加</span></div>
@@ -3623,13 +3640,25 @@ uintptr      *types.Basic     IsAlias=false</pre>
 </div>
 </div>
 <div class="paragraph">
-<p><code>Embedded()</code> は、その <code>Var</code> が埋め込みフィールドであるかどうかを返します。同じ挙動の <code>Anonymous()</code> もありますが、後方互換性のためだけに残されているので、新しく書くコードでは <code>Embedded()</code> を使いましょう。</p>
+<p><code>Embedded()</code> メソッドは、その <code>Var</code> が埋め込みフィールドであるかどうかを返します。</p>
 </div>
 <div class="listingblock">
 <div class="title">リスト 78. godoc: <a href="https://pkg.go.dev/go/types#Var.Embedded">go/types.Var.Embedded</a> <span class="version-badge version-badge-since">Go 1.11で追加</span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">obj</span> <span class="o">*</span><span class="n">Var</span><span class="p">)</span> <span class="n">Embedded</span><span class="p">()</span> <span class="kt">bool</span></code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<code>Anonymous()</code> メソッドも同じ挙動ですが、これは後方互換性のためだけに残されているそうです。
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>以下の例では、構造体 <code>S</code> のフィールドについて、その名前と型、<code>Embedded()</code> の結果を印字しています。</p>
@@ -3685,94 +3714,8 @@ type S struct {
 T2 T2 Embedded=false</pre>
 </div>
 </div>
-</div>
-<div class="sect4">
-<h5 id="型パラメータのインスタンス化によって生成されるオブジェクト"><a class="anchor" href="#型パラメータのインスタンス化によって生成されるオブジェクト"></a>型パラメータのインスタンス化によって生成されるオブジェクト</h5>
 <div class="paragraph">
-<p>ジェネリックな型や関数をインスタンス化すると、型パラメータに依存するフィールドや引数を表す <code>Var</code> は、具体化された新しいオブジェクトとして生成されます。</p>
-</div>
-<div class="paragraph">
-<p>このようにして合成された <code>Var</code> は対応するソースコード上の定義が存在しませんが、<code>Origin()</code> メソッドを使うことで、そのもとになった <code>Var</code> を得られます。</p>
-</div>
-<div class="listingblock">
-<div class="title">リスト 80. godoc: <a href="https://pkg.go.dev/go/types#Var.Origin">go/types.Var.Origin</a> <span class="version-badge version-badge-since">Go 1.19で追加</span></div>
-<div class="content">
-<pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">obj</span> <span class="o">*</span><span class="n">Var</span><span class="p">)</span> <span class="n">Origin</span><span class="p">()</span> <span class="o">*</span><span class="n">Var</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>以下で、インスタンス化されたジェネリックな型 <code>Gen[string]</code> のフィールドやメソッドの引数がどのように <code>Var</code> として表現されるかを確認します。</p>
-</div>
-<div class="listingblock">
-<div class="title">リスト 81. typesvarorigin.go <span class="icon"><a class="image" href="https://go.dev/play/p/un9meWhRypd" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
-<div class="content">
-<pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
-
-<span class="k">import</span> <span class="p">(</span>
-    <span class="s">"fmt"</span>
-    <span class="s">"go/ast"</span>
-    <span class="s">"go/importer"</span>
-    <span class="s">"go/parser"</span>
-    <span class="s">"go/token"</span>
-    <span class="s">"go/types"</span>
-<span class="p">)</span>
-
-<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
-
-    <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
-
-    <span class="n">pkg</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">conf</span><span class="o">.</span><span class="n">Check</span><span class="p">(</span><span class="s">"path/to/pkg"</span><span class="p">,</span> <span class="n">fset</span><span class="p">,</span> <span class="p">[]</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">File</span><span class="p">{</span><span class="n">f</span><span class="p">},</span> <span class="no">nil</span><span class="p">)</span>
-
-    <span class="c">// わかりやすさのため type assertion</span>
-    <span class="n">gObj</span> <span class="o">:=</span> <span class="n">pkg</span><span class="o">.</span><span class="n">Scope</span><span class="p">()</span><span class="o">.</span><span class="n">Lookup</span><span class="p">(</span><span class="s">"g"</span><span class="p">)</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Var</span><span class="p">)</span>
-    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">gObj</span><span class="p">)</span>
-
-    <span class="c">// Gen[string]</span>
-    <span class="n">gType</span> <span class="o">:=</span> <span class="n">gObj</span><span class="o">.</span><span class="n">Type</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Named</span><span class="p">)</span>
-
-    <span class="c">// Gen[string] のフィールド</span>
-    <span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">gType</span><span class="o">.</span><span class="n">Underlying</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Struct</span><span class="p">)</span><span class="o">.</span><span class="n">Fields</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">printVar</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-    <span class="p">}</span>
-
-    <span class="c">// Gen[string] のメソッド Meth の引数</span>
-    <span class="k">for</span> <span class="n">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">gType</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">0</span><span class="p">)</span><span class="o">.</span><span class="n">Signature</span><span class="p">()</span><span class="o">.</span><span class="n">Params</span><span class="p">()</span><span class="o">.</span><span class="n">Variables</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">printVar</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">func</span> <span class="n">printVar</span><span class="p">(</span><span class="n">fset</span> <span class="o">*</span><span class="n">token</span><span class="o">.</span><span class="n">FileSet</span><span class="p">,</span> <span class="n">v</span> <span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Var</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">Origin</span><span class="p">()</span> <span class="o">!=</span> <span class="n">v</span> <span class="p">{</span>
-        <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"</span><span class="se">\t</span><span class="s">Origin: %s (%s)</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">Origin</span><span class="p">(),</span> <span class="n">fset</span><span class="o">.</span><span class="n">Position</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">Origin</span><span class="p">()</span><span class="o">.</span><span class="n">Pos</span><span class="p">()))</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">var</span> <span class="n">src</span> <span class="o">=</span> <span class="s">`package p
-
-type Gen[T any] struct {
-    FieldT T
-    FieldNum int
-}
-
-func (Gen[T]) Meth(argT T, argNum int) {}
-
-var g Gen[string]
-`</span></code></pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>var path/to/pkg.g path/to/pkg.Gen[string]
-field FieldT string
-	Origin: field FieldT T (example.go:4:2)
-field FieldNum int
-var argT string
-	Origin: var argT T (example.go:8:20)
-var argNum int</pre>
-</div>
+<p>ジェネリックな型や関数のインスタンス化にともなって合成される <code>Var</code> もあります。これについては<a href="#ジェネリクス">ジェネリクス</a>で詳しく扱います。</p>
 </div>
 </div>
 </div>
@@ -3796,7 +3739,7 @@ var argNum int</pre>
 <p>などについて（ただちには）知ることができません。そこで <code>Check</code> 関数の最後の引数に渡す構造体、<code>types.Info</code> の出番となります。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 82. godoc: <a href="https://pkg.go.dev/go/types#Info">go/types.Info</a></div>
+<div class="title">リスト 80. godoc: <a href="https://pkg.go.dev/go/types#Info">go/types.Info</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Info</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="c">// Types maps expressions to their types, and for constant</span>
@@ -3948,6 +3891,266 @@ WIP
 <div class="sect3">
 <h4 id="types_type"><a class="anchor" href="#types_type"></a>4.9.1. types.Type</h4>
 
+</div>
+</div>
+<div class="sect2">
+<h3 id="ジェネリクス"><a class="anchor" href="#ジェネリクス"></a>4.10. ジェネリクス</h3>
+<div class="sect3">
+<h4 id="型パラメータ"><a class="anchor" href="#型パラメータ"></a>4.10.1. 型パラメータ</h4>
+
+</div>
+<div class="sect3">
+<h4 id="制約と型集合"><a class="anchor" href="#制約と型集合"></a>4.10.2. 制約と型集合</h4>
+
+</div>
+<div class="sect3">
+<h4 id="オブジェクトのインスタンス化"><a class="anchor" href="#オブジェクトのインスタンス化"></a>4.10.3. オブジェクトのインスタンス化</h4>
+<div class="paragraph">
+<p>ジェネリックな型や関数の型パラメータを型引数で置き換えることをインスタンス化と呼びます（<a href="https://go.dev/ref/spec#Instantiations">Instantiations</a>）。</p>
+</div>
+<div class="paragraph">
+<p><code>go/types</code> では、このようにしてインスタンス化された宣言を、合成されたオブジェクトとして表します。</p>
+</div>
+<div class="paragraph">
+<p>たとえば以下のプログラムにおいて、<code>g.FieldT</code> と <code>h.FieldT</code> はどちらも <code>Gen</code> の宣言中の <code>FieldT T</code> に由来しますが、型はそれぞれ <code>int</code> と <code>string</code> であり、それぞれ別の <code>Var</code> オブジェクトが対応します。一方で <code>g.FieldNum</code> と <code>h.FieldNum</code> は同一のオブジェクトです。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">p</span>
+
+<span class="k">type</span> <span class="n">Gen</span><span class="p">[</span><span class="n">T</span> <span class="n">any</span><span class="p">]</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">FieldT</span>   <span class="n">T</span>
+	<span class="n">FieldNum</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="k">var</span> <span class="n">g</span> <span class="n">Gen</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span>
+<span class="k">var</span> <span class="n">h</span> <span class="n">Gen</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span>
+
+<span class="k">var</span> <span class="n">_</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">FieldT</span>
+<span class="k">var</span> <span class="n">_</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">FieldT</span>
+<span class="k">var</span> <span class="n">_</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">FieldNum</span>
+<span class="k">var</span> <span class="n">_</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">FieldNum</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>このような合成されたオブジェクトはその <code>Pos()</code> が元のジェネリックなオブジェクトの位置と同一であり、<code>Origin()</code> メソッドで、元のオブジェクトを得られます。</p>
+</div>
+<div class="listingblock">
+<div class="title">リスト 81. godoc: <a href="https://pkg.go.dev/go/types#Var.Origin">go/types.Var.Origin</a> <span class="version-badge version-badge-since">Go 1.19で追加</span></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">obj</span> <span class="o">*</span><span class="n">Var</span><span class="p">)</span> <span class="n">Origin</span><span class="p">()</span> <span class="o">*</span><span class="n">Var</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">リスト 82. godoc: <a href="https://pkg.go.dev/go/types#Func.Origin">go/types.Func.Origin</a> <span class="version-badge version-badge-since">Go 1.19で追加</span></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">func</span> <span class="p">(</span><span class="n">obj</span> <span class="o">*</span><span class="n">Func</span><span class="p">)</span> <span class="n">Origin</span><span class="p">()</span> <span class="o">*</span><span class="n">Func</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>合成されるのは、以下のオブジェクトです。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>ジェネリックな型をインスタンス化したとき</p>
+<div class="ulist">
+<ul>
+<li>
+<p>その型パラメータに依存するフィールド <code>types.Var</code></p>
+</li>
+<li>
+<p>そのメソッド <code>types.Func</code> と、そのレシーバ・パラメータ・戻り値 <code>types.Var</code></p>
+</li>
+<li>
+<p>そのメソッドがジェネリックである場合は、その型パラメータ <code>types.TypeName</code></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>ジェネリックな関数やメソッドをインスタンス化したとき</p>
+<div class="ulist">
+<ul>
+<li>
+<p>パラメータ・戻り値 <code>types.Var</code></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+合成されたオブジェクトは基本的に <code>Origin()</code> メソッドで元のオブジェクトを参照できますが、執筆時点（Go 1.27）では、ジェネリックなメソッドの型パラメータには <code>Origin()</code> が存在しないようです。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>以下の例では、異なる型引数でインスタンス化したものどうしを比べて、それぞれが別のオブジェクトである（<code>same</code>）一方で、<code>Origin()</code> は同じである（<code>sameOrigin</code>）ことを確認しています。</p>
+</div>
+<div class="listingblock">
+<div class="title">リスト 83. typesinstantiation.go <span class="icon"><a class="image" href="https://go.dev/play/p/poN9POCcd5_E" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+    <span class="s">"fmt"</span>
+    <span class="s">"go/ast"</span>
+    <span class="s">"go/importer"</span>
+    <span class="s">"go/parser"</span>
+    <span class="s">"go/token"</span>
+    <span class="s">"go/types"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="nb">panic</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
+    <span class="n">info</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="n">types</span><span class="o">.</span><span class="n">Info</span><span class="p">{</span>
+        <span class="n">Uses</span><span class="o">:</span>      <span class="k">map</span><span class="p">[</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">Ident</span><span class="p">]</span><span class="n">types</span><span class="o">.</span><span class="n">Object</span><span class="p">{},</span>
+        <span class="n">Instances</span><span class="o">:</span> <span class="k">map</span><span class="p">[</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">Ident</span><span class="p">]</span><span class="n">types</span><span class="o">.</span><span class="n">Instance</span><span class="p">{},</span>
+    <span class="p">}</span>
+
+    <span class="n">pkg</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">conf</span><span class="o">.</span><span class="n">Check</span><span class="p">(</span><span class="s">"path/to/pkg"</span><span class="p">,</span> <span class="n">fset</span><span class="p">,</span> <span class="p">[]</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">File</span><span class="p">{</span><span class="n">f</span><span class="p">},</span> <span class="n">info</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="nb">panic</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="c">// ジェネリックな型をインスタンス化したとき</span>
+    <span class="n">genInt</span> <span class="o">:=</span> <span class="n">pkg</span><span class="o">.</span><span class="n">Scope</span><span class="p">()</span><span class="o">.</span><span class="n">Lookup</span><span class="p">(</span><span class="s">"genInt"</span><span class="p">)</span><span class="o">.</span><span class="n">Type</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Named</span><span class="p">)</span>   <span class="c">// Gen[int]</span>
+    <span class="n">genBool</span> <span class="o">:=</span> <span class="n">pkg</span><span class="o">.</span><span class="n">Scope</span><span class="p">()</span><span class="o">.</span><span class="n">Lookup</span><span class="p">(</span><span class="s">"genBool"</span><span class="p">)</span><span class="o">.</span><span class="n">Type</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Named</span><span class="p">)</span> <span class="c">// Gen[bool]</span>
+
+    <span class="n">compare</span><span class="p">(</span><span class="s">"Gen[_].FieldT"</span><span class="p">,</span>
+        <span class="n">genInt</span><span class="o">.</span><span class="n">Underlying</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Struct</span><span class="p">)</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="m">0</span><span class="p">),</span>
+        <span class="n">genBool</span><span class="o">.</span><span class="n">Underlying</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Struct</span><span class="p">)</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="m">0</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">compare</span><span class="p">(</span><span class="s">"Gen[_].Meth"</span><span class="p">,</span>
+        <span class="n">genInt</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">0</span><span class="p">),</span>
+        <span class="n">genBool</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">0</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">compare</span><span class="p">(</span><span class="s">"Gen[_].Meth(argT)"</span><span class="p">,</span>
+        <span class="n">genInt</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">0</span><span class="p">)</span><span class="o">.</span><span class="n">Signature</span><span class="p">()</span><span class="o">.</span><span class="n">Params</span><span class="p">()</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="m">0</span><span class="p">),</span>
+        <span class="n">genBool</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">0</span><span class="p">)</span><span class="o">.</span><span class="n">Signature</span><span class="p">()</span><span class="o">.</span><span class="n">Params</span><span class="p">()</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="m">0</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c">// GenMeth の型パラメータ U。TypeName には Origin() がないので</span>
+    <span class="c">// メソッドの Origin() から辿る</span>
+    <span class="n">uInt</span> <span class="o">:=</span> <span class="n">genInt</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="o">.</span><span class="n">Signature</span><span class="p">()</span><span class="o">.</span><span class="n">TypeParams</span><span class="p">()</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="m">0</span><span class="p">)</span>
+    <span class="n">uBool</span> <span class="o">:=</span> <span class="n">genBool</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="o">.</span><span class="n">Signature</span><span class="p">()</span><span class="o">.</span><span class="n">TypeParams</span><span class="p">()</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="m">0</span><span class="p">)</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"# %s</span><span class="se">\n</span><span class="s">%s vs %s</span><span class="se">\n</span><span class="s">same=%-5t sameOrigin=%t</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+        <span class="s">"Gen[_].GenMeth[U]"</span><span class="p">,</span>
+        <span class="n">uInt</span><span class="o">.</span><span class="n">Obj</span><span class="p">(),</span>
+        <span class="n">uBool</span><span class="o">.</span><span class="n">Obj</span><span class="p">(),</span>
+        <span class="n">uInt</span><span class="o">.</span><span class="n">Obj</span><span class="p">()</span> <span class="o">==</span> <span class="n">uBool</span><span class="o">.</span><span class="n">Obj</span><span class="p">(),</span>
+        <span class="n">genInt</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="o">.</span><span class="n">Origin</span><span class="p">()</span><span class="o">.</span><span class="n">Signature</span><span class="p">()</span><span class="o">.</span><span class="n">TypeParams</span><span class="p">()</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="n">uInt</span><span class="o">.</span><span class="n">Index</span><span class="p">())</span> <span class="o">==</span>
+            <span class="n">genBool</span><span class="o">.</span><span class="n">Method</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="o">.</span><span class="n">Origin</span><span class="p">()</span><span class="o">.</span><span class="n">Signature</span><span class="p">()</span><span class="o">.</span><span class="n">TypeParams</span><span class="p">()</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="n">uBool</span><span class="o">.</span><span class="n">Index</span><span class="p">()),</span>
+    <span class="p">)</span>
+
+    <span class="c">// ジェネリックな関数やメソッドをインスタンス化したとき</span>
+    <span class="c">// （ソースコード中の出現順に集める）</span>
+    <span class="k">var</span> <span class="n">idents</span> <span class="p">[]</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">Ident</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">ast</span><span class="o">.</span><span class="n">Preorder</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">ident</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">n</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">Ident</span><span class="p">);</span> <span class="n">ok</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="n">_</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">info</span><span class="o">.</span><span class="n">Instances</span><span class="p">[</span><span class="n">ident</span><span class="p">]</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Signature</span><span class="p">);</span> <span class="n">ok</span> <span class="p">{</span>
+                <span class="n">idents</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">idents</span><span class="p">,</span> <span class="n">ident</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">params</span> <span class="o">:=</span> <span class="k">func</span><span class="p">(</span><span class="n">ident</span> <span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">Ident</span><span class="p">)</span> <span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Tuple</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">info</span><span class="o">.</span><span class="n">Instances</span><span class="p">[</span><span class="n">ident</span><span class="p">]</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Signature</span><span class="p">)</span><span class="o">.</span><span class="n">Params</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="n">compare</span><span class="p">(</span><span class="s">"Fun[_]"</span><span class="p">,</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">Uses</span><span class="p">[</span><span class="n">idents</span><span class="p">[</span><span class="m">0</span><span class="p">]]</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Func</span><span class="p">),</span> <span class="c">// Fun[int] の Fun</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">Uses</span><span class="p">[</span><span class="n">idents</span><span class="p">[</span><span class="m">1</span><span class="p">]]</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Func</span><span class="p">),</span> <span class="c">// Fun[bool] の Fun</span>
+    <span class="p">)</span>
+
+    <span class="n">compare</span><span class="p">(</span><span class="s">"Fun[_](argT)"</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">(</span><span class="n">idents</span><span class="p">[</span><span class="m">0</span><span class="p">])</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="m">0</span><span class="p">),</span> <span class="c">// Fun[int]</span>
+        <span class="n">params</span><span class="p">(</span><span class="n">idents</span><span class="p">[</span><span class="m">1</span><span class="p">])</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="m">0</span><span class="p">),</span> <span class="c">// Fun[bool]</span>
+    <span class="p">)</span>
+
+    <span class="n">compare</span><span class="p">(</span><span class="s">"genInt.GenMeth[_](argU)"</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">(</span><span class="n">idents</span><span class="p">[</span><span class="m">2</span><span class="p">])</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="m">0</span><span class="p">),</span> <span class="c">// genInt.GenMeth[[]int]</span>
+        <span class="n">params</span><span class="p">(</span><span class="n">idents</span><span class="p">[</span><span class="m">3</span><span class="p">])</span><span class="o">.</span><span class="n">At</span><span class="p">(</span><span class="m">0</span><span class="p">),</span> <span class="c">// genInt.GenMeth[IntSlice]</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c">// a と b が同じオブジェクトかどうかと、それぞれの Origin() が同じかどうかを印字する</span>
+<span class="k">func</span> <span class="n">compare</span><span class="p">[</span><span class="n">O</span> <span class="k">interface</span> <span class="p">{</span>
+    <span class="n">comparable</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Stringer</span>
+    <span class="n">Origin</span><span class="p">()</span> <span class="n">O</span>
+<span class="p">}](</span><span class="n">label</span> <span class="kt">string</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="n">O</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"# %s</span><span class="se">\n</span><span class="s">%s vs %s</span><span class="se">\n</span><span class="s">same=%-5t sameOrigin=%t</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">Origin</span><span class="p">()</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">Origin</span><span class="p">())</span>
+<span class="p">}</span>
+
+<span class="k">var</span> <span class="n">src</span> <span class="o">=</span> <span class="s">`package p
+
+type Gen[T any] struct {
+    FieldT T
+}
+
+func (Gen[T]) Meth(argT T) {}
+
+func (Gen[T]) GenMeth[U ~[]T](argU U) {}
+
+func Fun[T any](argT T) {}
+
+type IntSlice []int
+
+var genInt Gen[int]
+var genBool Gen[bool]
+
+var _ = Fun[int]
+var _ = Fun[bool]
+
+var _ = genInt.GenMeth[[]int]
+var _ = genInt.GenMeth[IntSlice]
+`</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre># Gen[_].FieldT
+field FieldT int vs field FieldT bool
+same=false sameOrigin=true
+# Gen[_].Meth
+func (path/to/pkg.Gen[int]).Meth(argT int) vs func (path/to/pkg.Gen[bool]).Meth(argT bool)
+same=false sameOrigin=true
+# Gen[_].Meth(argT)
+var argT int vs var argT bool
+same=false sameOrigin=true
+# Gen[_].GenMeth[U]
+type parameter U ~[]int vs type parameter U ~[]bool
+same=false sameOrigin=true
+# Fun[_]
+func path/to/pkg.Fun[T any](argT T) vs func path/to/pkg.Fun[T any](argT T)
+same=true  sameOrigin=true
+# Fun[_](argT)
+var argT int vs var argT bool
+same=false sameOrigin=true
+# genInt.GenMeth[_](argU)
+var argU []int vs var argU path/to/pkg.IntSlice
+same=false sameOrigin=true</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>この中では例外として、<code>Fun[int]</code> における <code>Fun</code> と、<code>Fun[bool]</code> における <code>Fun</code> は同じオブジェクトです。<code>Fun</code> という名前の指すもの自体がインスタンス化で変化しているわけではないことを考えれば理解しやすいかと思います。</p>
+</div>
 </div>
 </div>
 <div class="sect2">
@@ -4160,7 +4363,7 @@ type Node interface {
 <p><code>go doc</code> サブコマンドに与えられるコマンドライン引数は、ユーザの意図を表した以下のような形の文字列のリストになっています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 83. go doc -h</div>
+<div class="title">リスト 84. go doc -h</div>
 <div class="content">
 <pre>% go doc -h
 Usage of [go] doc:
@@ -4370,7 +4573,7 @@ Usage of [go] doc:
 <p><code>go doc golang.org/x/tools/cmd/stringer</code> にある例を見るのが分かりやすいでしょう。以下のように定数を定義したソースコードを書いたとします。この定数を表示するため <code>fmt.Print(Uni)</code> などとしても、<code>2</code> と印字されるだけでどんな意味を持った値なのかの情報に欠けてしまっています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 84. sushi.go <span class="icon"><a class="image" href="https://go.dev/play/p/4AKhfaOgQp" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 85. sushi.go <span class="icon"><a class="image" href="https://go.dev/play/p/4AKhfaOgQp" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">sushi</span>
 
@@ -4388,7 +4591,7 @@ Usage of [go] doc:
 <p><code>fmt</code> パッケージのメソッドは、値が <code>fmt.Stringer</code> インタフェースを満たしていればその <code>String()</code> メソッドを利用するので、ここで <code>Sushi.String()</code> が定数の名前を返すようにすればいいはずです。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 85. godoc: <a href="https://pkg.go.dev/fmt#Stringer">fmt.Stringer</a></div>
+<div class="title">リスト 86. godoc: <a href="https://pkg.go.dev/fmt#Stringer">fmt.Stringer</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Stringer</span> <span class="k">interface</span> <span class="p">{</span>
     <span class="n">String</span><span class="p">()</span> <span class="kt">string</span>
@@ -4399,7 +4602,7 @@ Usage of [go] doc:
 <p>見るからに単調な作業なので、プログラム的に生成することを考えますよね。そこで <code>stringer</code> の出番です。以上のような内容のソースコード <code>sushi.go</code> に対して <code>stringer -type Sushi sushi.go</code> を実行すると、次のソースコードが <code>sushi_string.go</code> として生成されます。</p>
 </div>
 <div id="sushi_string.go" class="listingblock">
-<div class="title">リスト 86. sushi_string.go <span class="icon"><a class="image" href="https://go.dev/play/p/gfirJbaQVX" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 87. sushi_string.go <span class="icon"><a class="image" href="https://go.dev/play/p/gfirJbaQVX" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="c">// Code generated by "stringer -type Sushi sushi.go"; DO NOT EDIT</span>
 
@@ -4453,7 +4656,7 @@ Usage of [go] doc:
 <p>ソースコードファイルのリストは構文解析されたのち、<code>go/types</code> のAPIで型チェックされます。この際、型の定義の情報も収集するようになっており、これが後の工程で必要になってきます。定義の情報は <code>map[*ast.Ident]types.Object</code> の形で保持され、ソースコード中に出現する識別子の、その言語上の役割や型などの情報が得られます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 87. godoc: <a href="https://pkg.go.dev/go/types#Object">go/types.Object</a></div>
+<div class="title">リスト 88. godoc: <a href="https://pkg.go.dev/go/types#Object">go/types.Object</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Object</span> <span class="k">interface</span> <span class="p">{</span>
     <span class="n">Parent</span><span class="p">()</span> <span class="o">*</span><span class="n">Scope</span> <span class="c">// scope in which this object is declared; nil for methods and struct fields</span>
@@ -4713,7 +4916,7 @@ Usage of [go] doc:
 <p>各サービスは <code>gosrc.service</code> 構造体として表現されます：</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 88. godoc: github.com/golang/gddo/gosrc.service</div>
+<div class="title">リスト 89. godoc: github.com/golang/gddo/gosrc.service</div>
 <div class="content">
 <pre>// go doc github.com/golang/gddo/gosrc.service: 取得できませんでした</pre>
 </div>
@@ -4725,7 +4928,7 @@ Usage of [go] doc:
 <p><code>Directory</code> が主に利用される型となります。これはパッケージのインポートパスやパッケージを構成するファイル名を保持しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 89. godoc: github.com/golang/gddo/gosrc.Directory</div>
+<div class="title">リスト 90. godoc: github.com/golang/gddo/gosrc.Directory</div>
 <div class="content">
 <pre>// go doc github.com/golang/gddo/gosrc.Directory: 取得できませんでした</pre>
 </div>
@@ -4758,7 +4961,7 @@ Usage of [go] doc:
 <div class="sect4">
 <h5 id="例github"><a class="anchor" href="#例github"></a>例：GitHub</h5>
 <div class="listingblock">
-<div class="title">リスト 90. <a href="https://github.com/golang/go/blob/75e3d37/:gddo/gosrc/github.go#L20"><code>github.go:20</code></a></div>
+<div class="title">リスト 91. <a href="https://github.com/golang/go/blob/75e3d37/:gddo/gosrc/github.go#L20"><code>github.go:20</code></a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="n">addService</span><span class="p">(</span><span class="o">&amp;</span><span class="n">service</span><span class="p">{</span>
     <span class="n">pattern</span><span class="o">:</span>         <span class="n">regexp</span><span class="o">.</span><span class="n">MustCompile</span><span class="p">(</span><span class="s">`^github\.com/(?P&lt;owner&gt;[a-z0-9A-Z_.\-]+)/(?P&lt;repo&gt;[a-z0-9A-Z_.\-]+)(?P&lt;dir&gt;/.*)?$`</span><span class="p">),</span>
@@ -4789,7 +4992,7 @@ Usage of [go] doc:
 <p>通常はローカルのファイルシステムに対してファイルの探索を行うのですが、<code>build.Context</code> のファイルシステムへのアクセスに相当するフィールドを書き換えることで</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 91. godoc: <a href="https://pkg.go.dev/go/build#Context">go/build.Context</a></div>
+<div class="title">リスト 92. godoc: <a href="https://pkg.go.dev/go/build#Context">go/build.Context</a></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">type</span> <span class="n">Context</span> <span class="k">struct</span> <span class="p">{</span>
     <span class="n">GOARCH</span> <span class="kt">string</span> <span class="c">// target architecture</span>
@@ -4874,8 +5077,8 @@ Usage of [go] doc:
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 3a40c9d<br>
-Last updated 2026-10-02 00:23:00 UTC
+Version f3bec22<br>
+Last updated 2026-10-02 15:31:35 UTC
 </div>
 </div>
 </body>
