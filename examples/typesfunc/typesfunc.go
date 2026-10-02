@@ -25,8 +25,12 @@ func main() {
 	) // <1>
 
 	fmt.Println(objF)
-	fmt.Println(objT.Type().(*types.Named).Method(0))                  // <2>
+	fmt.Println(objT.Type().(*types.Named).Method(0)) // <2>
+	//          ~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~
+	//                    type T           func (*T).F()
 	fmt.Println(objI.Type().Underlying().(*types.Interface).Method(0)) // <3>
+	//          ~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~
+	//             type I          interface { F() }         func I.F()
 }
 
 var src = `package p

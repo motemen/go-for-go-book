@@ -311,7 +311,11 @@ goexample::typesfunc[output]
 <2> 型 `T` に属する最初のメソッドとして、`T.F()` に対応するオブジェクトを取得します。
 <3> 型 `I` が指すインタフェース `interface { F() }` の最初の（抽象）メソッドとして、`I.F()` に対応するオブジェクトを取得します。
 
-インタフェースの抽象メソッドと、それ以外の具象メソッドに対応するオブジェクトへアクセスする方法は微妙に異なりますが、これはあとの節で詳しく触れます。
+このように、インタフェースの抽象メソッドと、それ以外の具象メソッドに対応するオブジェクトへアクセスする方法は微妙に異なります。
+
+関数やメソッドの持つ型は、`types.Signature` として表現され、これが関数のレシーバ・パラメータや戻り値、型パラメータなどの情報を保持します。
+
+型パラメータを持つ関数（`func F[T any](x T)`）や、ジェネリックな型のメソッド（`func (Gen[T]) Meth(argT T)`）も `Func` として表現されます。また、ジェネリックな型のインスタンス化にともなって合成される `Func` もあります。これらについては<<ジェネリクス>>で詳しく扱います。
 
 === types.PkgName
 
@@ -362,7 +366,7 @@ goexample::typesuniversetypename[output]
 * メソッドのレシーバ
 * 構造体のフィールド
 
-これらのうちどれであるかは、`Kind()` メソッドが返す `types.VarKind` で区別できます。
+これらのうちのいずれであるかは、`Kind` since:go/types.Var.Kind[] メソッドが返す `types.VarKind` で区別できます。
 
 godoc::go/types.PackageVar[]
 
@@ -374,30 +378,18 @@ godoc::go/types.PackageVar[]
 
 godoc::go/types.Var.IsField[]
 
-`Embedded()` は、その `Var` が埋め込みフィールドであるかどうかを返します。同じ挙動の `Anonymous()` もありますが、後方互換性のためだけに残されているので、新しく書くコードでは `Embedded()` を使いましょう。
+`Embedded()` メソッドは、その `Var` が埋め込みフィールドであるかどうかを返します。
 
 godoc::go/types.Var.Embedded[]
+
+NOTE: `Anonymous()` メソッドも同じ挙動ですが、これは後方互換性のためだけに残されているそうです。
 
 以下の例では、構造体 `S` のフィールドについて、その名前と型、`Embedded()` の結果を印字しています。
 
 goexample::typesvarembedded[]
 goexample::typesvarembedded[output]
 
-==== 型パラメータのインスタンス化によって生成されるオブジェクト
-
-ジェネリックな型や関数をインスタンス化すると、型パラメータに依存するフィールドや引数を表す `Var` は、具体化された新しいオブジェクトとして生成されます。
-
-このようにして合成された `Var` は対応するソースコード上の定義が存在しませんが、`Origin()` メソッドを使うことで、そのもとになった `Var` を得られます。
-
-godoc::go/types.Var.Origin[]
-
-以下で、インスタンス化されたジェネリックな型 `Gen[string]` のフィールドやメソッドの引数がどのように `Var` として表現されるかを確認します。
-
-goexample::typesvarorigin[]
-
-goexample::typesvarorigin[output]
-
-// TODO: Func.Origin() も同様。型パラメータの節を書くときに合わせて触れる
+ジェネリックな型や関数のインスタンス化にともなって合成される `Var` もあります。これについては<<ジェネリクス>>で詳しく扱います。
 
 == types.Info
 
@@ -417,6 +409,73 @@ WARNING: WIP
 == 型の情報
 
 === types.Type
+
+== ジェネリクス
+
+=== 型パラメータ
+// TODO:
+// * TypeName と TypeParam の組。TypeParam は Obj()・Index()・Constraint() を持つ
+// * TypeParamList の持ち主: Named.TypeParams()、Alias.TypeParams()、Signature.TypeParams()、Signature.RecvTypeParams()
+// ** Go 1.27 のジェネリックなメソッド `func (Gen[T]) M[U any]()` では TypeParams()（U）と RecvTypeParams()（T）の両方が値を持つ
+// * レシーバの T は型宣言の T とは別の TypeParam オブジェクト
+// * 関数の型パラメータは Func.Scope() に入る。型宣言の型パラメータはパッケージスコープではない別のスコープに入る
+// * types.Instance
+
+=== 制約と型集合
+// TODO:
+// * 制約は常にインタフェース。`[P ~int | ~string]` は暗黙のインタフェースで包まれる（Interface.IsImplicit()）
+// * Union と Term
+
+=== オブジェクトのインスタンス化
+
+ジェネリックな型や関数の型パラメータを型引数で置き換えることをインスタンス化と呼びます（link:https://go.dev/ref/spec#Instantiations[Instantiations]）。
+
+`go/types` では、このようにしてインスタンス化された宣言を、合成されたオブジェクトとして表します。
+
+たとえば以下のプログラムにおいて、`g.FieldT` と `h.FieldT` はどちらも `Gen` の宣言中の `FieldT T` に由来しますが、型はそれぞれ `int` と `string` であり、それぞれ別の `Var` オブジェクトが対応します。一方で `g.FieldNum` と `h.FieldNum` は同一のオブジェクトです。
+
+[source,go]
+----
+package p
+
+type Gen[T any] struct {
+	FieldT   T
+	FieldNum int
+}
+
+var g Gen[int]
+var h Gen[string]
+
+var _ = g.FieldT
+var _ = h.FieldT
+var _ = g.FieldNum
+var _ = h.FieldNum
+----
+
+このような合成されたオブジェクトはその `Pos()` が元のジェネリックなオブジェクトの位置と同一であり、`Origin()` メソッドで、元のオブジェクトを得られます。
+
+godoc::go/types.Var.Origin[]
+
+godoc::go/types.Func.Origin[]
+
+合成されるのは、以下のオブジェクトです。
+
+* ジェネリックな型をインスタンス化したとき
+** その型パラメータに依存するフィールド `types.Var`
+** そのメソッド `types.Func` と、そのレシーバ・パラメータ・戻り値 `types.Var`
+** そのメソッドがジェネリックである場合は、その型パラメータ `types.TypeName`
+* ジェネリックな関数やメソッドをインスタンス化したとき
+** パラメータ・戻り値 `types.Var`
+
+NOTE: 合成されたオブジェクトは基本的に `Origin()` メソッドで元のオブジェクトを参照できますが、執筆時点（Go 1.27）では、ジェネリックなメソッドの型パラメータには `Origin()` が存在しないようです。
+
+以下の例では、異なる型引数でインスタンス化したものどうしを比べて、それぞれが別のオブジェクトである（`same`）一方で、`Origin()` は同じである（`sameOrigin`）ことを確認しています。
+
+goexample::typesinstantiation[]
+
+goexample::typesinstantiation[output]
+
+この中では例外として、`Fun[int]` における `Fun` と、`Fun[bool]` における `Fun` は同じオブジェクトです。`Fun` という名前の指すもの自体がインスタンス化で変化しているわけではないことを考えれば理解しやすいかと思います。
 
 [appendix]
 == types.Objectの階層
