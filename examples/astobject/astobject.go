@@ -13,7 +13,7 @@ func main() {
 
 	ast.Inspect(f, func(n ast.Node) bool {
 		if ident, ok := n.(*ast.Ident); ok && ident.Name == "x" {
-			var decl interface{}
+			var decl any
 			if ident != nil && ident.Obj != nil {
 				decl = ident.Obj.Decl
 			}

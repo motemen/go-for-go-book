@@ -20,8 +20,7 @@ func main() {
 	st := pkg.Scope().Lookup("S").Type().Underlying().(*types.Struct)
 
 	qf := types.RelativeTo(pkg)
-	for i := range st.NumFields() {
-		field := st.Field(i)
+	for field := range st.Fields() {
 		fmt.Printf("%s %s Embedded=%v\n",
 			field.Name(), types.TypeString(field.Type(), qf), field.Embedded())
 	}
