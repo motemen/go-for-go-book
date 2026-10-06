@@ -50,8 +50,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version f3bec22,</span>
-<span id="revdate">2026-10-03T00:31:16+09:00</span>
+<span id="revnumber">version 1c6cb9b,</span>
+<span id="revdate">2026-10-06T13:00:01+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -335,7 +335,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x1b18a1034040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x1b18a1034060)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x8d737528040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x8d737528060)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1362,8 +1362,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x3f2ec2d02100), (*ast.Field)(0x3f2ec2d02140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x3f2ec2d02100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x3a4c4a018100), (*ast.Field)(0x3a4c4a018140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x3a4c4a018100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -3664,7 +3664,7 @@ uintptr      *types.Basic     IsAlias=false</pre>
 <p>以下の例では、構造体 <code>S</code> のフィールドについて、その名前と型、<code>Embedded()</code> の結果を印字しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 79. typesvarembedded.go <span class="icon"><a class="image" href="https://go.dev/play/p/GbnEOqmKrxi" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 79. typesvarembedded.go <span class="icon"><a class="image" href="https://go.dev/play/p/y3G6C6hABye" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -3688,8 +3688,7 @@ uintptr      *types.Basic     IsAlias=false</pre>
     <span class="n">st</span> <span class="o">:=</span> <span class="n">pkg</span><span class="o">.</span><span class="n">Scope</span><span class="p">()</span><span class="o">.</span><span class="n">Lookup</span><span class="p">(</span><span class="s">"S"</span><span class="p">)</span><span class="o">.</span><span class="n">Type</span><span class="p">()</span><span class="o">.</span><span class="n">Underlying</span><span class="p">()</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="o">.</span><span class="n">Struct</span><span class="p">)</span>
 
     <span class="n">qf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">RelativeTo</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">st</span><span class="o">.</span><span class="n">NumFields</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">field</span> <span class="o">:=</span> <span class="n">st</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">st</span><span class="o">.</span><span class="n">Fields</span><span class="p">()</span> <span class="p">{</span>
         <span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"%s %s Embedded=%v</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
             <span class="n">field</span><span class="o">.</span><span class="n">Name</span><span class="p">(),</span> <span class="n">types</span><span class="o">.</span><span class="n">TypeString</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">Type</span><span class="p">(),</span> <span class="n">qf</span><span class="p">),</span> <span class="n">field</span><span class="o">.</span><span class="n">Embedded</span><span class="p">())</span>
     <span class="p">}</span>
@@ -5077,8 +5076,8 @@ Usage of [go] doc:
 </div>
 <div id="footer">
 <div id="footer-text">
-Version f3bec22<br>
-Last updated 2026-10-02 15:31:35 UTC
+Version 1c6cb9b<br>
+Last updated 2026-10-06 04:00:11 UTC
 </div>
 </div>
 </body>
