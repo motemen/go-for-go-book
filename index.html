@@ -28,6 +28,184 @@ body { word-break: break-word; }
 .version-badge-deprecated { background: #8a6d3b; }
 </style>
 
+<style>
+/* ダークモード: Asciidoctor 標準スタイルシートの色を上書きする */
+:root { color-scheme: light dark; }
+@media (prefers-color-scheme: dark) {
+  body { background: #0d1117; color: #c9d1d9; }
+  a { color: #58a6ff; }
+  a:hover, a:focus { color: #79c0ff; }
+  h1, h2, h3, #toctitle, .sidebarblock>.content>.title, h4, h5, h6,
+  #content h1>a.link, h2>a.link, h3>a.link, #toctitle>a.link, .sidebarblock>.content>.title>a.link, h4>a.link, h5>a.link, h6>a.link { color: #f0866e; }
+  #content h1>a.link:hover, h2>a.link:hover, h3>a.link:hover, #toctitle>a.link:hover, h4>a.link:hover, h5>a.link:hover, h6>a.link:hover { color: #ffa28c; }
+  h1 small, h2 small, h3 small, h4 small, h5 small, h6 small { color: #a0645a; }
+  .subheader, #toctitle, .sidebarblock>.content>.title,
+  .admonitionblock td.content>.title, .audioblock>.title, .exampleblock>.title, .imageblock>.title, .listingblock>.title, .literalblock>.title, .stemblock>.title, .openblock>.title, .paragraph>.title, .quoteblock>.title, table.tableblock>.title, .verseblock>.title, .videoblock>.title, .dlist>.title, .olist>.title, .ulist>.title, .qlist>.title, .hdlist>.title { color: #e3a48f; }
+
+  #header>h1:first-child, #content>h1:first-child:not([class]),
+  #header .details span.email a, #header .details br+span.author::before,
+  .paragraph.lead>p, #preamble>.sectionbody>[class=paragraph]:first-of-type p,
+  blockquote, blockquote p, .quoteblock blockquote, .quoteblock p, .verseblock pre { color: #c9d1d9; }
+  #header .details, .admonitionblock>table td.content, .quoteblock .attribution cite, .verseblock .attribution cite, #footer-text { color: #8b949e; }
+  code, pre, p a>code:hover, kbd, .menuseq, .menuref, .keyseq,
+  table thead tr th, table thead tr td, table tfoot tr th, table tfoot tr td, table tr th, table tr td,
+  tbody tr th, tbody tr th p, tfoot tr th, tfoot tr th p { color: #c9d1d9; }
+
+  hr, abbr[title], blockquote, #toc, .sect1+.sect1,
+  #header>h1:first-child+#toc, #header>h1:only-child, #header .details, #content>h1:first-child:not([class]),
+  body.toc2 #header>h1:nth-last-child(2), .admonitionblock>table td.content,
+  .quoteblock.excerpt>blockquote, .quoteblock .quoteblock { border-color: #30363d !important; }
+  #toc.toc2 { background: #161b22; border-color: #30363d; }
+  #content #toc { background: #161b22; border-color: #30363d; }
+
+  :not(pre):not([class^=L])>code { background: #262c36; }
+  .literalblock pre, .listingblock>.content>pre:not(.highlight), .listingblock>.content>pre[class=highlight], .listingblock>.content>pre[class^="highlight "], .prettyprint { background: #161b22; }
+  .literalblock.output pre { background: #010409; color: #c9d1d9; }
+  kbd { background: #161b22; border-color: #30363d; box-shadow: 0 1px 0 rgba(0,0,0,.4), inset 0 0 0 .1em #0d1117; }
+  mark { background: #bb8009; color: #0d1117; }
+
+  table { background: #0d1117; border-color: #30363d; }
+  table.tableblock, th.tableblock, td.tableblock { border-color: #30363d; }
+  table thead, table tfoot, tbody tr th { background: #161b22; }
+  table tr.even, table tr.alt,
+  table.stripes-all>*>tr, table.stripes-odd>*>tr:nth-of-type(odd), table.stripes-even>*>tr:nth-of-type(even), table.stripes-hover>*>tr:hover { background: #161b22; }
+  .admonitionblock>table, .hdlist>table, .colist>table, table.linenotable { background: none; }
+
+  .exampleblock>.content { background: #161b22; border-color: #30363d; box-shadow: 0 1px 4px rgba(0,0,0,.6); }
+  .sidebarblock { background: #161b22; border-color: #30363d; }
+  .thumb, .th { border-color: #0d1117; box-shadow: 0 0 0 1px #30363d; }
+
+  .admonitionblock td.icon .icon-note::before { color: #58a6ff; }
+  .admonitionblock td.icon .icon-tip::before { color: #e3b341; text-shadow: none; }
+  .admonitionblock td.icon .icon-warning::before { color: #d29922; }
+  .admonitionblock td.icon .icon-caution::before { color: #f0883e; }
+  .admonitionblock td.icon .icon-important::before { color: #f85149; }
+  .conum[data-value] { background: #c9d1d9; color: #0d1117 !important; }
+  .conum[data-value] * { color: #0d1117 !important; }
+
+  #footer { background: #010409; }
+
+  .version-badge { background: #1f6f80; }
+  .version-badge-deprecated { background: #7a5e2a; }
+
+  /* Rouge (github.dark テーマ) */
+  pre.rouge, pre.rouge .w {
+    color: #c9d1d9;
+    background-color: #161b22;
+  }
+  pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
+    color: #ff7b72;
+  }
+  pre.rouge .gr {
+    color: #f0f6fc;
+  }
+  pre.rouge .gd {
+    color: #ffdcd7;
+    background-color: #67060c;
+  }
+  pre.rouge .nb {
+    color: #ffa657;
+  }
+  pre.rouge .nc {
+    color: #ffa657;
+  }
+  pre.rouge .no {
+    color: #ffa657;
+  }
+  pre.rouge .nn {
+    color: #ffa657;
+  }
+  pre.rouge .sr {
+    color: #7ee787;
+  }
+  pre.rouge .na {
+    color: #7ee787;
+  }
+  pre.rouge .nt {
+    color: #7ee787;
+  }
+  pre.rouge .gi {
+    color: #aff5b4;
+    background-color: #033a16;
+  }
+  pre.rouge .ges {
+    font-weight: bold;
+    font-style: italic;
+  }
+  pre.rouge .kc {
+    color: #79c0ff;
+  }
+  pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
+    color: #79c0ff;
+  }
+  pre.rouge .sb {
+    color: #79c0ff;
+  }
+  pre.rouge .bp {
+    color: #79c0ff;
+  }
+  pre.rouge .ne {
+    color: #79c0ff;
+  }
+  pre.rouge .nl {
+    color: #79c0ff;
+  }
+  pre.rouge .py {
+    color: #79c0ff;
+  }
+  pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
+    color: #79c0ff;
+  }
+  pre.rouge .o, pre.rouge .ow {
+    color: #79c0ff;
+  }
+  pre.rouge .gh {
+    color: #1f6feb;
+    font-weight: bold;
+  }
+  pre.rouge .gu {
+    color: #1f6feb;
+    font-weight: bold;
+  }
+  pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
+    color: #a5d6ff;
+  }
+  pre.rouge .nd {
+    color: #d2a8ff;
+  }
+  pre.rouge .nf, pre.rouge .fm {
+    color: #d2a8ff;
+  }
+  pre.rouge .err {
+    color: #f0f6fc;
+    background-color: #8e1519;
+  }
+  pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
+    color: #8b949e;
+  }
+  pre.rouge .gl {
+    color: #8b949e;
+  }
+  pre.rouge .gt {
+    color: #8b949e;
+  }
+  pre.rouge .ni {
+    color: #c9d1d9;
+  }
+  pre.rouge .si {
+    color: #c9d1d9;
+  }
+  pre.rouge .ge {
+    color: #c9d1d9;
+    font-style: italic;
+  }
+  pre.rouge .gs {
+    color: #c9d1d9;
+    font-weight: bold;
+  }
+}
+</style>
+
 <script>
 if (/\.github\.io$/.test(location.host) && location.protocol === 'http:') {
   location.protocol = 'https:';
@@ -50,8 +228,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version 1c6cb9b,</span>
-<span id="revdate">2026-10-06T13:00:01+09:00</span>
+<span id="revnumber">version 016f271,</span>
+<span id="revdate">2026-10-07T22:56:31+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -335,7 +513,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x8d737528040), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x8d737528060)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x3e36456d4080), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x3e36456d40a0)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1362,8 +1540,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x3a4c4a018100), (*ast.Field)(0x3a4c4a018140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x3a4c4a018100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x30798ee04100), (*ast.Field)(0x30798ee04140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x30798ee04100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -5076,8 +5254,8 @@ Usage of [go] doc:
 </div>
 <div id="footer">
 <div id="footer-text">
-Version 1c6cb9b<br>
-Last updated 2026-10-06 04:00:11 UTC
+Version 016f271<br>
+Last updated 2026-10-07 13:56:41 UTC
 </div>
 </div>
 </body>
