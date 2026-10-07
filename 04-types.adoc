@@ -408,7 +408,196 @@ WARNING: WIP
 
 == 型の情報
 
+型解析によって、プログラム中に現れる式にどのような型が与えられたのかを知ることができます。ここではその型を表すデータ構造について見ていきます。
+
 === types.Type
+
+`go/types` では、Goの型を `types.Type` インタフェースで表現します。
+
+godoc::go/types.Type[]
+
+`types.Type` 自体は `Underlying()` と `String()` の2つのメソッドしか持たず、型の具体的な情報はこのインタフェースを実装するデータ型ごとに異なるメソッドで提供されます。<<オブジェクト>>と同じく、型の種類は具体的なデータ型によって区別されるので、type switchやtype assertionで判別して使うことになります。具体的なデータ型については<<types.Typeの階層>>を参照してください。
+
+以下の例では、パッケージスコープに宣言されたさまざまな変数や型について、その型を表すデータ型を印字しています。
+
+goexample::typestypeswitch[]
+
+goexample::typestypeswitch[output]
+
+おおむね理解できる結果ではないかと思います。
+
+以下では、`types.Type` の扱い方と、いくつかの具体的な型の表現について個別に見ていきます。
+
+==== Underlying type
+
+`Underlying()` メソッドは、その型のlink:https://go.dev/ref/spec#Underlying_types[Underlying type]を返します。仕様上、すべての型はunderlying typeを持ち、
+
+[loweralpha]
+. あらかじめ宣言された型や、型リテラルで書かれた型のunderlying typeは、その型自身
+. `type T ...` のように宣言された型 `T` のunderlying typeは、その参照する先の型のunderlying type
+. 型パラメータのunderlying typeは、その制約のunderlying type（つまりインタフェース型）
+
+です。この定義を辿れば、underlying typeはa.のあらかじめ宣言された型もしくは型リテラルで書かれた型になります。
+
+なので、ある型についてその詳細（構造体型のフィールドなど）を知りたいときは、一度 `Underlying()` を経由して確認することになります。
+
+[source,go]
+----
+if st, ok := typ.Underlying().(*types.Struct); ok {
+	// ...
+}
+----
+
+=== types.Basic
+
+`types.Basic` は、`int` や `string`、`bool` といった、あらかじめ宣言された基本的な型を表します。
+
+godoc::go/types.Basic[]
+
+`Kind()` メソッドは、それがどの基本型であるかを `types.BasicKind` 型の定数で返します。
+
+godoc::go/types.BasicKind[]
+godoc::go/types.Invalid[]
+
+`types.Basic` は基本型なので、ユーザが組み立てる方法は提供されていません。
+代わりに `types.Typ` という配列が定義されています。これはl types.BasicKind をインデックスとし、対応する `*types.Basic` を引くものです。たとえば `types.Typ[types.String]` は `string` 型に対応する `*types.Basic` です。
+
+godoc::go/types.Typ[]
+
+// BasicInfo もいる？
+// UntypedXXX もいる？
+
+=== types.Named
+
+`types.Named` は、`type T struct{ ... }` のような型宣言によって定義された型（link:https://go.dev/ref/spec#Type_definitions[defined type]）を表します。
+
+godoc::go/types.Named[]
+
+[NOTE]
+.Named = Defined?
+====
+Go 1.9で型エイリアスが導入される以前は、仕様ではdefined typeのことを「named type」と呼んでいました。エイリアス導入以前の世界では「名前がある型はそれぞれ固有の型」という扱いでしたが、型エイリアスによって「名前がついているが別の型と同一」である型が存在するようになり、現在の仕様では「defined type」と呼ばれるようになっています。
+
+// https://go-review.googlesource.com/c/go/+/36213
+// 変更前の仕様（「Two named types are identical if their type names originate in the same TypeSpec」）:
+// https://github.com/golang/go/blob/go1.8/doc/go_spec.html#L1421
+// Go 1.18 で named type が「固有の同一性を持つ型」の総称として再導入された経緯は、以下のコミットメッセージにまとまっている:
+// https://go-review.googlesource.com/c/go/+/757120
+====
+
+その名のとおり名前を持っているので、 `Obj()` メソッドによりその型を宣言した<<types.TypeName>>オブジェクトを得られます。
+
+==== ジェネリックな型
+
+ジェネリックな型の宣言 `type List[T any] []T` も `types.Named` で表現され、`TypeParams()` でその型パラメータの一覧を得られます。
+
+また、`List[string]` のようにインスタンス化された型も、それぞれ別の `types.Named` として表現されます。インスタンスに対しては `TypeArgs()` で型引数の一覧を、`Origin()` でインスタンス化の元になったジェネリックな型を得られます。これについては<<ジェネリクス>>で詳しく扱います。
+
+=== types.Signature
+
+`types.Signature` は関数の型を表します。宣言された関数やメソッド、関数リテラルが持つ型です。
+
+godoc::go/types.Signature[]
+
+`Params()` と `Results()` はそれぞれパラメータと戻り値を `types.Tuple` として返します。`types.Tuple` は<<types.Var>>の並びで、`Len()` と `At(i)`、あるいは `Variables()` でその要素にアクセスできます。名前のないパラメータは、名前が空文字列の `Var` として表現されます。
+
+godoc::go/types.Tuple[]
+
+NOTE: `types.Tuple` も `types.Type` を実装していますが、Goの言語上の型ではありません。関数の戻り値やcomma-okの形の式など、式の型に多値が登場することが多いため、ほかの型と同様に扱えるように `types.Type` を実装しているのだと思われます。
+
+`Variadic()` は、関数が可変長引数を持つかどうかを返します。可変長引数を持つ関数では、最後のパラメータの型が `...T` ではなく `[]T` というスライス型として表現されます。
+
+`Recv()` は、メソッドであればそのレシーバを `Var` として返し、そうでなければ `nil` を返します。
+
+goexample::typessignature[]
+
+goexample::typessignature[output]
+
+// NOTE: シグネチャの同一性の判定（`types.Identical`）では、レシーバは無視されます。そのため、メソッド `(*T).M` の型と、関数型 `func(int) bool` は同一とみなされます。 -> <<型の比較>> にまとめる
+
+`TypeParams()` と `RecvTypeParams()` は、それぞれ関数の型パラメータと、ジェネリックな型のメソッドのレシーバの型パラメータを返します。これらについては<<ジェネリクス>>で扱います。
+
+=== types.Alias
+
+`types.Alias` は、`type A = T` のような型エイリアス宣言（link:https://go.dev/ref/spec#Alias_declarations[Alias declarations]）によって導入された型を表します。
+
+godoc::go/types.Alias[]
+
+エイリアスは別の型に別名をつけるもので、言語上は `A` と `T` はまったく同じ型です。しかし `go/types` では、ソースコード上でどの名前が使われたかを保持するため、エイリアスを `types.Alias` という独立した型として表現します。
+
+`Rhs()` は宣言の右辺に書かれた型を返します。これ自体がエイリアスである可能性もあるので、エイリアスをすべてたどった先の型が必要な場合は `types.Unalias` 関数を使います。
+
+godoc::go/types.Unalias[]
+
+goexample::typesalias[]
+
+goexample::typesalias[output]
+
+変数 `x` の型が `T` ではなく `B` として表現されていることに注意してください。<<types.Type>>で見た「`Underlying()` を経由して型の構造を調べる」という定石はエイリアスに対してもそのまま使えますが、`*types.Named` であるかどうかを判定したい場合などは、事前に `types.Unalias` を適用する必要があります。
+
+[source,go]
+----
+if named, ok := types.Unalias(typ).(*types.Named); ok {
+	// ...
+}
+----
+
+[NOTE]
+====
+`types.Alias` はGo 1.22で導入されました。それ以前の `go/types` ではエイリアスが独立した型を持たず、エイリアスの名前は解決済みの型（上の例でいえば `T`）に置き換えられていました。
+
+Go 1.22では `GODEBUG=gotypesalias=1` を指定した場合にのみ `types.Alias` が使われ、Go 1.23からデフォルトで有効となっています。
+====
+
+Go 1.24からは、`type Set[K comparable] = map[K]bool` のようにエイリアスも型パラメータを持てるようになりました。これに対応し、Go 1.23から `types.Alias` も `TypeParams()`、`TypeArgs()`、`Origin()` メソッドを持っています。
+
+=== types.TypeParam
+
+`types.TypeParam` は、ジェネリックな関数や型の宣言における型パラメータの型を表します。
+
+godoc::go/types.TypeParam[]
+
+`Obj()` で型パラメータの名前に対応する <<types.TypeName>>を得られます。
+
+// TODO: Index() はなんであるの
+// * NewTypeParam 直後は -1。型パラメータリストに束縛されたとき（bindTParams）に設定される
+// ** 公開APIでは NewSignatureType、Named.SetTypeParams、Alias.SetTypeParams。型チェック中は decl.go（制約より先に束縛する。go.dev/issue/47887）、signature.go（レシーバ）
+// ** ひとつの TypeParam は複数のリストに束縛できない（panic("type parameter bound more than once")）
+// * 公開された経緯は https://github.com/golang/go/issues/47916 のコメント
+// ** 当初は非公開。「At(i) で取り出すのだから文脈から常に分かる」という理由（findleyr, 2021-10-05）
+// ** mdempsky は慎重派。外側の型パラメータリストもある場合は index だけでは区別できない。Var にも Tuple 内の index はないが困っていない
+// ** 「束縛済みかどうか分かる」「エラーメッセージの整形など、持ち主のリストが手元にないときに使える」程度の利点（findleyr, 2021-10-06）
+// ** 決め手は cmd/api で型パラメータを $<index> と書く必要が出たこと（CL 355389）。「Index は型パラメータの同一性の一部」として公開（findleyr, 2021-10-12、rsc「Adding Index SGTM」）
+// * 実際の利用例：go/types の hash.go（ジェネリックなシグネチャ内の型パラメータを index でハッシュする）、cmd/compile/internal/noder/writer.go（辞書上の位置の計算）
+
+goexample::typestypeparam[]
+
+goexample::typestypeparam[output]
+
+型パラメータについて、詳しくは次の<<ジェネリクス>>で扱います。
+
+=== 型の操作
+
+==== 型の比較
+
+// 型どうしが同じであるかを判定するには、`==` ではなく `types.Identical` 関数を使います。
+
+// godoc::go/types.Identical[]
+
+// たとえば `[]int` という型が2回登場すれば、それぞれ別の `*types.Slice` の値として表現されることがあり、`==` では比較できません。一方で `types.Named` は宣言ごとにひとつ作られる（ジェネリックな型のインスタンスを除く）ので、名前をつけられた型どうしであれば `==` で比較しても期待どおり動くことが多いのですが、一般には `types.Identical` を使っておくのが安全です。
+
+// TODO: AssignableTo, ConvertibleTo, Implements, AssertableTo あたりもどこかで扱う
+
+==== 型の文字列表現
+
+// `String()` メソッドは型を文字列で表現しますが、上の例の `path/to/pkg.T` のように、名前をつけられた型はパッケージのパスで修飾されて表示されます。修飾の仕方を制御したい場合は `types.TypeString` 関数と `types.Qualifier` を使います。
+
+// godoc::go/types.TypeString[]
+
+// godoc::go/types.Qualifier[]
+
+// `types.RelativeTo(pkg)` は、`pkg` に属する名前を修飾せず、それ以外をパッケージのパスで修飾する `Qualifier` を返します。<<types.Var>>の例ではこれを使っていました。
+
 
 == ジェネリクス
 
