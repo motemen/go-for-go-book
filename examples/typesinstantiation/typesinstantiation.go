@@ -11,7 +11,7 @@ import (
 
 func main() {
 	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, "example.go", src, parser.Mode(0))
+	f, err := parser.ParseFile(fset, "example.go", src, parser.SkipObjectResolution)
 	if err != nil {
 		panic(err)
 	}

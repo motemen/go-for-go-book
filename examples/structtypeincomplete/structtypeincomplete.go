@@ -9,7 +9,7 @@ import (
 
 func main() {
 	fset := token.NewFileSet()
-	f, _ := parser.ParseFile(fset, "example.go", src, parser.Mode(0))
+	f, _ := parser.ParseFile(fset, "example.go", src, parser.SkipObjectResolution)
 
 	structType := f.Decls[0].(*ast.GenDecl).Specs[0].(*ast.TypeSpec).Type.(*ast.StructType)
 

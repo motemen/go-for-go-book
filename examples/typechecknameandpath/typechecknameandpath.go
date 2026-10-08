@@ -19,7 +19,7 @@ func main() {
 	fset := token.NewFileSet()
 	files := []*ast.File{}
 	for _, name := range bPkg.GoFiles {
-		f, _ := parser.ParseFile(fset, filepath.Join(bPkg.Dir, name), nil, parser.Mode(0))
+		f, _ := parser.ParseFile(fset, filepath.Join(bPkg.Dir, name), nil, parser.SkipObjectResolution)
 		files = append(files, f)
 	}
 

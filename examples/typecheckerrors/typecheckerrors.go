@@ -11,7 +11,7 @@ import (
 
 func main() {
 	fset := token.NewFileSet()
-	f, _ := parser.ParseFile(fset, "example.go", src, parser.Mode(0))
+	f, _ := parser.ParseFile(fset, "example.go", src, parser.SkipObjectResolution)
 
 	conf := types.Config{
 		Importer: importer.Default(),

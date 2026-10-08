@@ -9,7 +9,7 @@ import (
 
 func main() {
 	fset := token.NewFileSet()
-	f, _ := parser.ParseFile(fset, "example.go", src, parser.Mode(0))
+	f, _ := parser.ParseFile(fset, "example.go", src, parser.SkipObjectResolution)
 
 	for n := range ast.Preorder(f) {
 		if ident, ok := n.(*ast.Ident); ok {
