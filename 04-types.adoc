@@ -408,7 +408,7 @@ WARNING: WIP
 
 == 型の情報
 
-型解析によって、プログラム中に現れる式にどのような型が与えられたのかを知ることができます。ここではその型を表すデータ構造について見ていきます。
+型解析によって、プログラム中の式にどのような型が与えられたのかを知ることができます。ここではその型を表すデータ構造について見ていきます。
 
 === types.Type
 
@@ -424,7 +424,7 @@ goexample::typestypeswitch[]
 
 goexample::typestypeswitch[output]
 
-おおむね理解できる結果ではないかと思います。
+おおむね理解できる結果ではないでしょうか。
 
 以下では、`types.Type` の扱い方と、いくつかの具体的な型の表現について個別に見ていきます。
 
@@ -437,7 +437,7 @@ goexample::typestypeswitch[output]
 . `type T ...` のように宣言された型 `T` のunderlying typeは、その参照する先の型のunderlying type
 . 型パラメータのunderlying typeは、その制約のunderlying type（つまりインタフェース型）
 
-です。この定義を辿れば、underlying typeはa.のあらかじめ宣言された型もしくは型リテラルで書かれた型になります。
+です。この定義を辿れば、underlying typeは(a)のあらかじめ宣言された型もしくは型リテラルで書かれた型になります。
 
 なので、ある型についてその詳細（構造体型のフィールドなど）を知りたいときは、一度 `Underlying()` を経由して確認することになります。
 
@@ -539,7 +539,7 @@ goexample::typesalias[]
 
 goexample::typesalias[output]
 
-変数 `x` の型は `T` ではなく、`B` として表現されています。
+変数 `x` の型は `B` として表現されています。
 また、`Underlying()`、`Rhs()`、`types.Unalias()` によってそれぞれ異なる型が得られていることを確認してください。
 
 Go 1.24からは、`type Set[K comparable] = map[K]bool` のようにエイリアスも型パラメータを持てるようになりました。これに対応し、Go 1.23から `types.Alias` も `TypeParams()`、`TypeArgs()`、`Origin()` メソッドを持っています。
