@@ -228,8 +228,8 @@ if (!/\blocalhost\b/.test(location.host)) {
 <h1>GoのためのGo</h1>
 <div class="details">
 <span id="author" class="author">motemen (https://motemen.github.io/)</span><br>
-<span id="revnumber">version dced9c5,</span>
-<span id="revdate">2026-10-09T00:26:17+09:00</span>
+<span id="revnumber">version eafad10,</span>
+<span id="revdate">2026-10-09T00:41:13+09:00</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">目次</div>
@@ -276,9 +276,9 @@ if (!/\blocalhost\b/.test(location.host)) {
 <li><a href="#token_position">1.4.3. token.Position</a></li>
 </ul>
 </li>
-<li><a href="#ast-object-deprecation">1.5. <code>ast.Object</code> の非推奨化</a>
+<li><a href="#ast-object-deprecation">1.5. ast.Object の非推奨化</a>
 <ul class="sectlevel3">
-<li><a href="#ast_object">1.5.1. <code>ast.Object</code></a></li>
+<li><a href="#ast_object">1.5.1. ast.Object</a></li>
 <li><a href="#構文解析だけでは不十分な例">1.5.2. 構文解析だけでは不十分な例</a></li>
 <li><a href="#非推奨化の経緯">1.5.3. 非推奨化の経緯</a></li>
 </ul>
@@ -519,7 +519,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x308d40f86080), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x308d40f860a0)}</pre>
+<pre>&amp;ast.BinaryExpr{X:(*ast.Ident)(0x3d555999e080), OpPos:3, Op:14, Y:(*ast.UnaryExpr)(0x3d555999e0a0)}</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -674,7 +674,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 <p>最後の引数 <code>mode</code> では構文解析する範囲の指定などが行えます。これについては次の<a href="#parser_mode">parser.Mode</a>で説明します。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 8. parsefile.go <span class="icon"><a class="image" href="https://go.dev/play/p/HGVqc1bczw" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 8. parsefile.go <span class="icon"><a class="image" href="https://go.dev/play/p/i8_1WSg66cz" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -687,7 +687,7 @@ if (!/\blocalhost\b/.test(location.host)) {
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">d</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">f</span><span class="o">.</span><span class="n">Decls</span> <span class="p">{</span>
         <span class="n">ast</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
@@ -729,52 +729,37 @@ func add(n, m int) {}
      1  .  Name: *ast.Ident {
      2  .  .  NamePos: example.go:3:6
      3  .  .  Name: "add"
-     4  .  .  Obj: *ast.Object {
-     5  .  .  .  Kind: func
-     6  .  .  .  Name: "add"
-     7  .  .  .  Decl: *(obj @ 0)
-     8  .  .  }
-     9  .  }
-    10  .  Type: *ast.FuncType {
-    11  .  .  Func: example.go:3:1
-    12  .  .  Params: *ast.FieldList {
-    13  .  .  .  Opening: example.go:3:9
-    14  .  .  .  List: []*ast.Field (len = 1) {
-    15  .  .  .  .  0: *ast.Field {
-    16  .  .  .  .  .  Names: []*ast.Ident (len = 2) {
-    17  .  .  .  .  .  .  0: *ast.Ident {
-    18  .  .  .  .  .  .  .  NamePos: example.go:3:10
-    19  .  .  .  .  .  .  .  Name: "n"
-    20  .  .  .  .  .  .  .  Obj: *ast.Object {
-    21  .  .  .  .  .  .  .  .  Kind: var
-    22  .  .  .  .  .  .  .  .  Name: "n"
-    23  .  .  .  .  .  .  .  .  Decl: *(obj @ 15)
-    24  .  .  .  .  .  .  .  }
-    25  .  .  .  .  .  .  }
-    26  .  .  .  .  .  .  1: *ast.Ident {
-    27  .  .  .  .  .  .  .  NamePos: example.go:3:13
-    28  .  .  .  .  .  .  .  Name: "m"
-    29  .  .  .  .  .  .  .  Obj: *ast.Object {
-    30  .  .  .  .  .  .  .  .  Kind: var
-    31  .  .  .  .  .  .  .  .  Name: "m"
-    32  .  .  .  .  .  .  .  .  Decl: *(obj @ 15)
-    33  .  .  .  .  .  .  .  }
-    34  .  .  .  .  .  .  }
-    35  .  .  .  .  .  }
-    36  .  .  .  .  .  Type: *ast.Ident {
-    37  .  .  .  .  .  .  NamePos: example.go:3:15
-    38  .  .  .  .  .  .  Name: "int"
-    39  .  .  .  .  .  }
-    40  .  .  .  .  }
-    41  .  .  .  }
-    42  .  .  .  Closing: example.go:3:18
-    43  .  .  }
-    44  .  }
-    45  .  Body: *ast.BlockStmt {
-    46  .  .  Lbrace: example.go:3:20
-    47  .  .  Rbrace: example.go:3:21
-    48  .  }
-    49  }</pre>
+     4  .  }
+     5  .  Type: *ast.FuncType {
+     6  .  .  Func: example.go:3:1
+     7  .  .  Params: *ast.FieldList {
+     8  .  .  .  Opening: example.go:3:9
+     9  .  .  .  List: []*ast.Field (len = 1) {
+    10  .  .  .  .  0: *ast.Field {
+    11  .  .  .  .  .  Names: []*ast.Ident (len = 2) {
+    12  .  .  .  .  .  .  0: *ast.Ident {
+    13  .  .  .  .  .  .  .  NamePos: example.go:3:10
+    14  .  .  .  .  .  .  .  Name: "n"
+    15  .  .  .  .  .  .  }
+    16  .  .  .  .  .  .  1: *ast.Ident {
+    17  .  .  .  .  .  .  .  NamePos: example.go:3:13
+    18  .  .  .  .  .  .  .  Name: "m"
+    19  .  .  .  .  .  .  }
+    20  .  .  .  .  .  }
+    21  .  .  .  .  .  Type: *ast.Ident {
+    22  .  .  .  .  .  .  NamePos: example.go:3:15
+    23  .  .  .  .  .  .  Name: "int"
+    24  .  .  .  .  .  }
+    25  .  .  .  .  }
+    26  .  .  .  }
+    27  .  .  .  Closing: example.go:3:18
+    28  .  .  }
+    29  .  }
+    30  .  Body: *ast.BlockStmt {
+    31  .  .  Lbrace: example.go:3:20
+    32  .  .  Rbrace: example.go:3:21
+    33  .  }
+    34  }</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -825,7 +810,7 @@ func add(n, m int) {}
 </dd>
 <dt class="hdlist1"><code>SkipObjectResolution</code></dt>
 <dd>
-<p>構文解析の段階で行われる識別子の解決をスキップします。この機能が生成する <code>ast.Object</code> などはすでに非推奨となっており、<code>ParseFile</code> のドキュメントでもこのフラグの指定が推奨されています。詳しくは<a href="#ast-object-deprecation"><code>ast.Object</code> の非推奨化</a>で解説します。</p>
+<p>構文解析の段階で行われる識別子の解決をスキップします。この機能が生成する <code>ast.Object</code> などはすでに非推奨となっており、<code>ParseFile</code> のドキュメントでもこのフラグの指定が推奨されています。詳しくは<a href="#ast-object-deprecation">ast.Object の非推奨化</a>で解説します。</p>
 </dd>
 </dl>
 </div>
@@ -836,7 +821,7 @@ func add(n, m int) {}
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-<code>DeclarationErrors</code> は宣言に関するエラーを報告するフラグとなっていますが、内部では非推奨となった機構を利用しているため（<a href="#ast-object-deprecation"><code>ast.Object</code> の非推奨化</a>）、使用しないほうがいいかもしれません。
+<code>DeclarationErrors</code> は宣言に関するエラーを報告するフラグとなっていますが、内部では非推奨となった機構を利用しているため（<a href="#ast-object-deprecation">ast.Object の非推奨化</a>）、使用しないほうがいいかもしれません。
 </td>
 </tr>
 </table>
@@ -882,7 +867,7 @@ func add(n, m int) {}
 <p>で解説します。</p>
 </div>
 <div class="paragraph">
-<p><code>Scope</code> と <code>Unresolved</code> はGo 1.22で非推奨となりました。詳しくは<a href="#ast-object-deprecation"><code>ast.Object</code> の非推奨化</a>で解説します。</p>
+<p><code>Scope</code> と <code>Unresolved</code> はGo 1.22で非推奨となりました。詳しくは<a href="#ast-object-deprecation">ast.Object の非推奨化</a>で解説します。</p>
 </div>
 </div>
 <div class="sect3">
@@ -917,7 +902,7 @@ func add(n, m int) {}
 <p>以下は先ほどのソースコードファイル中の識別子を一覧する例です。訪問したノードの具体的な型を知るために、type assertionをおこなっています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 13. listidents.go <span class="icon"><a class="image" href="https://go.dev/play/p/wURu7fnXi2S" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 13. listidents.go <span class="icon"><a class="image" href="https://go.dev/play/p/sk2GviEwRSl" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -930,7 +915,7 @@ func add(n, m int) {}
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">n</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">ast</span><span class="o">.</span><span class="n">Preorder</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="n">ident</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">n</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">Ident</span><span class="p">);</span> <span class="n">ok</span> <span class="p">{</span>
@@ -980,7 +965,7 @@ int</pre>
 <p>先ほどの識別子を一覧する例を、それぞれの識別子が根からどのようなノードを経て現れるのかも表示するように書き換えてみましょう。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 15. preorderstack.go <span class="icon"><a class="image" href="https://go.dev/play/p/z40t60w8zdm" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 15. preorderstack.go <span class="icon"><a class="image" href="https://go.dev/play/p/ciDaJyRLHFF" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -994,7 +979,7 @@ int</pre>
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">ast</span><span class="o">.</span><span class="n">PreorderStack</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="no">nil</span><span class="p">,</span> <span class="k">func</span><span class="p">(</span><span class="n">n</span> <span class="n">ast</span><span class="o">.</span><span class="n">Node</span><span class="p">,</span> <span class="n">stack</span> <span class="p">[]</span><span class="n">ast</span><span class="o">.</span><span class="n">Node</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
         <span class="n">ident</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">n</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">Ident</span><span class="p">)</span>
@@ -1483,7 +1468,7 @@ field in the AST (ast.FuncDecl.Recv) field is not restricted to one entry.</pre>
 <p><code>ast.Ident</code> はコード中の識別子を表し、変数名をはじめパッケージ名、ラベルなどさまざまな場所に登場します。</p>
 </div>
 <div class="paragraph">
-<p><code>Obj</code> フィールドが非推奨となっていることについては、<a href="#ast-object-deprecation"><code>ast.Object</code> の非推奨化</a>で触れます。</p>
+<p><code>Obj</code> フィールドが非推奨となっていることについては、<a href="#ast-object-deprecation">ast.Object の非推奨化</a>で触れます。</p>
 </div>
 </div>
 <div class="sect4">
@@ -1512,7 +1497,7 @@ field in the AST (ast.FuncDecl.Recv) field is not restricted to one entry.</pre>
 <p>これら2つの構造体はそれぞれ構造体、インタフェースを表現します。また、<code>Incomplete</code> フィールドを持っています。これらは通常 <code>false</code> ですが、<a href="#ast.Filter">フィルタ</a>によってノード中のフィールドやメソッドの宣言が取り除かれる際に <code>true</code> となり、ソースコードとノードに乖離があることを示します。<code>go doc</code> が出力する &#8220;// Has unexported fields.&#8221; はこの値を参照しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 23. structtypeincomplete.go <span class="icon"><a class="image" href="https://go.dev/play/p/28fDrrXZiR" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 23. structtypeincomplete.go <span class="icon"><a class="image" href="https://go.dev/play/p/ZBalQaXEAQh" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -1525,7 +1510,7 @@ field in the AST (ast.FuncDecl.Recv) field is not restricted to one entry.</pre>
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">structType</span> <span class="o">:=</span> <span class="n">f</span><span class="o">.</span><span class="n">Decls</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">GenDecl</span><span class="p">)</span><span class="o">.</span><span class="n">Specs</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">TypeSpec</span><span class="p">)</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">StructType</span><span class="p">)</span>
 
@@ -1546,8 +1531,8 @@ type S struct {
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>fields=[]*ast.Field{(*ast.Field)(0x1eb414104100), (*ast.Field)(0x1eb414104140)} incomplete=false
-fields=[]*ast.Field{(*ast.Field)(0x1eb414104100)} incomplete=true</pre>
+<pre>fields=[]*ast.Field{(*ast.Field)(0x158b46e14100), (*ast.Field)(0x158b46e14140)} incomplete=false
+fields=[]*ast.Field{(*ast.Field)(0x158b46e14100)} incomplete=true</pre>
 </div>
 </div>
 </div>
@@ -2198,12 +2183,12 @@ Valid position with file name:      example.go:2:3</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="ast-object-deprecation"><a class="anchor" href="#ast-object-deprecation"></a>1.5. <code>ast.Object</code> の非推奨化</h3>
+<h3 id="ast-object-deprecation"><a class="anchor" href="#ast-object-deprecation"></a>1.5. ast.Object の非推奨化</h3>
 <div class="paragraph">
 <p><code>ast.Object</code> やそれらにまつわるAPIは1.22で非推奨化されました（<a href="https://go.dev/doc/go1.22#minor_library_changes" class="bare">https://go.dev/doc/go1.22#minor_library_changes</a>）。以下では、これらのもともとの動機と、非推奨化の経緯について概説します。</p>
 </div>
 <div class="sect3">
-<h4 id="ast_object"><a class="anchor" href="#ast_object"></a>1.5.1. <code>ast.Object</code></h4>
+<h4 id="ast_object"><a class="anchor" href="#ast_object"></a>1.5.1. ast.Object</h4>
 <div class="paragraph">
 <p>ソースコード中の識別子を表す <code>ast.Ident</code> には、<code>*ast.Object</code> 型の <code>Obj</code> というフィールドが定義されていました。</p>
 </div>
@@ -2490,7 +2475,7 @@ func ParseFile(fset *token.FileSet, filename string, src interface{}, mode Mode)
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-以前は <code>doc.New</code> 関数が使われていましたが、これが引数に取る <code>ast.Package</code> はGo 1.22で非推奨となっています（&#8594; <a href="#ast-object-deprecation"><code>ast.Object</code> の非推奨化</a>）。また <code>doc.New</code> では例示のためのテストが収集されません。
+以前は <code>doc.New</code> 関数が使われていましたが、これが引数に取る <code>ast.Package</code> はGo 1.22で非推奨となっています（&#8594; <a href="#ast-object-deprecation">ast.Object の非推奨化</a>）。また <code>doc.New</code> では例示のためのテストが収集されません。
 </td>
 </tr>
 </table>
@@ -2678,7 +2663,7 @@ WIP
 <p>最後の引数である <code>info *types.Info</code> は、パッケージ内の型にまつわる詳細な情報を格納する先として指定します。単純に型チェックを行いたいだけの場合は <code>nil</code> でも構いません。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 49. typechecksimple.go <span class="icon"><a class="image" href="https://go.dev/play/p/szN-pDyXak" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 49. typechecksimple.go <span class="icon"><a class="image" href="https://go.dev/play/p/4Xi_LiXqeLm" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2693,7 +2678,7 @@ WIP
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -2904,7 +2889,7 @@ Go 1.27時点では、<code>runtime.Compiler</code> の値は <code>"gc"</code> 
 このことを使って、自前でモジュールシステムに対応した <code>Importer</code> を実装できます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 56. importergolist.go <span class="icon"><a class="image" href="https://go.dev/play/p/_nejtbRcLl4" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 56. importergolist.go <span class="icon"><a class="image" href="https://go.dev/play/p/yAA1DbJgKeW" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -2923,7 +2908,7 @@ Go 1.27時点では、<code>runtime.Compiler</code> の値は <code>"gc"</code> 
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">lookup</span> <span class="o">:=</span> <span class="k">func</span><span class="p">(</span><span class="n">path</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">ReadCloser</span><span class="p">,</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"lookup:"</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
@@ -3037,7 +3022,7 @@ golang.org/x/tools/go/packages.Config
 <p>以下で、ソフトなエラーとそうでない重篤なエラーの例を確認できます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 58. typecheckerrors.go <span class="icon"><a class="image" href="https://go.dev/play/p/GJ5RPbyr4K" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 58. typecheckerrors.go <span class="icon"><a class="image" href="https://go.dev/play/p/5VFeniHBhvd" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -3052,7 +3037,7 @@ golang.org/x/tools/go/packages.Config
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span>
         <span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">(),</span>
@@ -3109,7 +3094,7 @@ example.go:7:2: invalid operation: s + 1 (mismatched types string and untyped in
 <p>あまり意味のない例ですが、以下では <code>$GOROOT/src/cmd/cover</code> ディレクトリのソースコードの型チェックを行っています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 60. typechecknameandpath.go <span class="icon"><a class="image" href="https://go.dev/play/p/Mc9LJ6XJyE5" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 60. typechecknameandpath.go <span class="icon"><a class="image" href="https://go.dev/play/p/2XH2O_zZAG0" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -3132,7 +3117,7 @@ example.go:7:2: invalid operation: s + 1 (mismatched types string and untyped in
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
     <span class="n">files</span> <span class="o">:=</span> <span class="p">[]</span><span class="o">*</span><span class="n">ast</span><span class="o">.</span><span class="n">File</span><span class="p">{}</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">bPkg</span><span class="o">.</span><span class="n">GoFiles</span> <span class="p">{</span>
-        <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="n">filepath</span><span class="o">.</span><span class="n">Join</span><span class="p">(</span><span class="n">bPkg</span><span class="o">.</span><span class="n">Dir</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="no">nil</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="n">filepath</span><span class="o">.</span><span class="n">Join</span><span class="p">(</span><span class="n">bPkg</span><span class="o">.</span><span class="n">Dir</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="no">nil</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
         <span class="n">files</span> <span class="o">=</span> <span class="nb">append</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
     <span class="p">}</span>
 
@@ -3456,7 +3441,7 @@ invalid type (*types.Basic)</pre>
 <p><a href="https://go.dev/ref/spec#Constant_expressions">定数式</a>は型チェック時に評価され、値としてオブジェクトに保持されます（TODO: 定数畳み込み）。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 72. typesconst.go <span class="icon"><a class="image" href="https://go.dev/play/p/6QfOZ6VFWX" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 72. typesconst.go <span class="icon"><a class="image" href="https://go.dev/play/p/vkzfuwHwB39" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -3471,7 +3456,7 @@ invalid type (*types.Basic)</pre>
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -3520,7 +3505,7 @@ const (
 <p>以下で、それぞれの場合（トップレベルの関数 <code>F</code>、型 <code>*T</code> のメソッド <code>F</code>、インタフェース <code>I</code> のメソッド <code>F</code>）の出現を確認しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 73. typesfunc.go <span class="icon"><a class="image" href="https://go.dev/play/p/mIqamLkV3T7" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 73. typesfunc.go <span class="icon"><a class="image" href="https://go.dev/play/p/SuqXydfzyWb" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -3535,7 +3520,7 @@ const (
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -3619,7 +3604,7 @@ func (path/to/pkg.I).F()</pre>
 <p>インポートしたパッケージの名前はパッケージスコープではなくファイルスコープに導入されるため、後の節で説明する<a href="#types_info"><code>Info</code> 構造体</a>を使ってファイルスコープを取得しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 74. typespkgname.go <span class="icon"><a class="image" href="https://go.dev/play/p/AIQENS7mLZ" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 74. typespkgname.go <span class="icon"><a class="image" href="https://go.dev/play/p/TugDPJemVim" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -3634,7 +3619,7 @@ func (path/to/pkg.I).F()</pre>
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -3848,7 +3833,7 @@ uintptr      *types.Basic     IsAlias=false</pre>
 <p>以下の例では、構造体 <code>S</code> のフィールドについて、その名前と型、<code>Embedded()</code> の結果を印字しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 79. typesvarembedded.go <span class="icon"><a class="image" href="https://go.dev/play/p/y3G6C6hABye" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 79. typesvarembedded.go <span class="icon"><a class="image" href="https://go.dev/play/p/LQkgCtI-A15" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -3863,7 +3848,7 @@ uintptr      *types.Basic     IsAlias=false</pre>
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -4101,7 +4086,7 @@ WIP
 <p>以下の例では、パッケージスコープに宣言されたさまざまな変数や型について、その型を表すデータ型を印字しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 82. typestypeswitch.go <span class="icon"><a class="image" href="https://go.dev/play/p/xdxeIYk6IpF" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 82. typestypeswitch.go <span class="icon"><a class="image" href="https://go.dev/play/p/Xj5m5R_fQJU" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -4116,7 +4101,7 @@ WIP
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -4397,7 +4382,7 @@ x  *types.Alias       path/to/pkg.A                *types.Struct</pre>
 <p><code>Recv()</code> は、メソッドであればそのレシーバを <code>Var</code> として返し、そうでなければ <code>nil</code> を返します。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 90. typessignature.go <span class="icon"><a class="image" href="https://go.dev/play/p/uAhGExMtZ1F" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 90. typessignature.go <span class="icon"><a class="image" href="https://go.dev/play/p/Sag9fGxOO6C" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -4412,7 +4397,7 @@ x  *types.Alias       path/to/pkg.A                *types.Struct</pre>
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -4502,7 +4487,7 @@ func(string) error
 </div>
 </div>
 <div class="listingblock">
-<div class="title">リスト 93. typesalias.go <span class="icon"><a class="image" href="https://go.dev/play/p/uT8Tyw4Bc6l" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 93. typesalias.go <span class="icon"><a class="image" href="https://go.dev/play/p/nrszYIqLB6G" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -4517,7 +4502,7 @@ func(string) error
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -4588,7 +4573,7 @@ types.Unalias(x): path/to/pkg.T (*types.Named)</pre>
 <p><code>Obj()</code> で型パラメータの名前に対応する <a href="#types_typename">types.TypeName</a>を得られます。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 95. typestypeparam.go <span class="icon"><a class="image" href="https://go.dev/play/p/F6xk5rJB6Km" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 95. typestypeparam.go <span class="icon"><a class="image" href="https://go.dev/play/p/4lNlCmskRsk" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -4603,7 +4588,7 @@ types.Unalias(x): path/to/pkg.T (*types.Named)</pre>
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
 
     <span class="n">conf</span> <span class="o">:=</span> <span class="n">types</span><span class="o">.</span><span class="n">Config</span><span class="p">{</span><span class="n">Importer</span><span class="o">:</span> <span class="n">importer</span><span class="o">.</span><span class="n">Default</span><span class="p">()}</span>
 
@@ -4753,7 +4738,7 @@ xs: []S (*types.Slice)</pre>
 <p>以下の例では、異なる型引数でインスタンス化したものどうしを比べて、それぞれが別のオブジェクトである（<code>same</code>）一方で、<code>Origin()</code> は同じである（<code>sameOrigin</code>）ことを確認しています。</p>
 </div>
 <div class="listingblock">
-<div class="title">リスト 98. typesinstantiation.go <span class="icon"><a class="image" href="https://go.dev/play/p/poN9POCcd5_E" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
+<div class="title">リスト 98. typesinstantiation.go <span class="icon"><a class="image" href="https://go.dev/play/p/ltxnChoSQQI" target="_blank" rel="noopener"><i class="fa fa-play-circle-o" title="View in Go Playground"></i></a></span></div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="go"><span class="k">package</span> <span class="n">main</span>
 
@@ -4768,7 +4753,7 @@ xs: []S (*types.Slice)</pre>
 
 <span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">fset</span> <span class="o">:=</span> <span class="n">token</span><span class="o">.</span><span class="n">NewFileSet</span><span class="p">()</span>
-    <span class="n">f</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">Mode</span><span class="p">(</span><span class="m">0</span><span class="p">))</span>
+    <span class="n">f</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">parser</span><span class="o">.</span><span class="n">ParseFile</span><span class="p">(</span><span class="n">fset</span><span class="p">,</span> <span class="s">"example.go"</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">SkipObjectResolution</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
         <span class="nb">panic</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
     <span class="p">}</span>
@@ -5834,8 +5819,8 @@ Usage of [go] doc:
 </div>
 <div id="footer">
 <div id="footer-text">
-Version dced9c5<br>
-Last updated 2026-10-08 15:27:33 UTC
+Version eafad10<br>
+Last updated 2026-10-08 15:41:29 UTC
 </div>
 </div>
 </body>
