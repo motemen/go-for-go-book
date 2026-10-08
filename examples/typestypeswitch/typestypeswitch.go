@@ -26,6 +26,7 @@ func main() {
 var src = `package p
 
 type T struct{ X int }
+type A = T
 
 var b bool
 var a [3]int
@@ -36,4 +37,5 @@ var c chan<- bool
 var f func(int) error
 var i interface{ M() }
 var t T
+var x A
 `

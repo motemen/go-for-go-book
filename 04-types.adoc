@@ -460,7 +460,7 @@ godoc::go/types.BasicKind[]
 godoc::go/types.Invalid[]
 
 `types.Basic` は基本型なので、ユーザが組み立てる方法は提供されていません。
-代わりに `types.Typ` という配列が定義されています。これはl types.BasicKind をインデックスとし、対応する `*types.Basic` を引くものです。たとえば `types.Typ[types.String]` は `string` 型に対応する `*types.Basic` です。
+代わりに `types.Typ` という配列が定義されています。これは `types.BasicKind` をインデックスとし、対応する `*types.Basic` を引くものです。たとえば `types.Typ[types.String]` は `string` 型に対応する `*types.Basic` です。
 
 godoc::go/types.Typ[]
 
@@ -469,14 +469,20 @@ godoc::go/types.Typ[]
 
 === types.Named
 
-`types.Named` は、`type T struct{ ... }` のような型宣言によって定義された型（link:https://go.dev/ref/spec#Type_definitions[defined type]）を表します。
+`types.Named` は、`type T struct{ ... }` のような型宣言によって定義された型（link:https://go.dev/ref/spec#Type_definitions[defined types]）を表します。
 
 godoc::go/types.Named[]
 
 [NOTE]
 .Named = Defined?
 ====
-Go 1.9で型エイリアスが導入される以前は、仕様ではdefined typeのことを「named type」と呼んでいました。エイリアス導入以前の世界では「名前がある型はそれぞれ固有の型」という扱いでしたが、型エイリアスによって「名前がついているが別の型と同一」である型が存在するようになり、現在の仕様では「defined type」と呼ばれるようになっています。
+Go 1.9で型エイリアスが導入される以前、仕様では型定義によって作られる型のことを「named type」と呼んでいました。当時は型に名前をつける方法が型定義のみだったので、名前を持つ型はつねにほかの型と異なる固有の型だったからです。
+
+型エイリアスの登場によって、名前を持つにもかかわらず別の型と同一である型が存在するようになったため、型定義によって作られる型のことを「defined type」と呼ぶようになりました。
+
+`go/types` の `types.Named` は以前のこの呼び方を引き継いだものです。
+
+ちなみに、現在の仕様では、「named type」は `any` を除くterm:事前宣言された型[predeclared types]、defined type、型パラメータを指すことになっています（link:https://go.dev/ref/spec#Types[Types]）。`any` が除かれているのは、これが型リテラル `interface{}` のエイリアスだからです。
 
 // https://go-review.googlesource.com/c/go/+/36213
 // 変更前の仕様（「Two named types are identical if their type names originate in the same TypeSpec」）:
@@ -533,21 +539,8 @@ goexample::typesalias[]
 
 goexample::typesalias[output]
 
-変数 `x` の型が `T` ではなく `B` として表現されていることに注意してください。<<types.Type>>で見た「`Underlying()` を経由して型の構造を調べる」という定石はエイリアスに対してもそのまま使えますが、`*types.Named` であるかどうかを判定したい場合などは、事前に `types.Unalias` を適用する必要があります。
-
-[source,go]
-----
-if named, ok := types.Unalias(typ).(*types.Named); ok {
-	// ...
-}
-----
-
-[NOTE]
-====
-`types.Alias` はGo 1.22で導入されました。それ以前の `go/types` ではエイリアスが独立した型を持たず、エイリアスの名前は解決済みの型（上の例でいえば `T`）に置き換えられていました。
-
-Go 1.22では `GODEBUG=gotypesalias=1` を指定した場合にのみ `types.Alias` が使われ、Go 1.23からデフォルトで有効となっています。
-====
+変数 `x` の型は `T` ではなく、`B` として表現されています。
+また、`Underlying()`、`Rhs()`、`types.Unalias()` によってそれぞれ異なる型が得られていることを確認してください。
 
 Go 1.24からは、`type Set[K comparable] = map[K]bool` のようにエイリアスも型パラメータを持てるようになりました。これに対応し、Go 1.23から `types.Alias` も `TypeParams()`、`TypeArgs()`、`Origin()` メソッドを持っています。
 
