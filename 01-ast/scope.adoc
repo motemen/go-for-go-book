@@ -1,9 +1,9 @@
 [#ast-object-deprecation]
-= `ast.Object` の非推奨化
+= ast.Object の非推奨化
 
 `ast.Object` やそれらにまつわるAPIは1.22で非推奨化されました（<https://go.dev/doc/go1.22#minor_library_changes>）。以下では、これらのもともとの動機と、非推奨化の経緯について概説します。
 
-== `ast.Object`
+== ast.Object
 
 ソースコード中の識別子を表す `ast.Ident` には、`*ast.Object` 型の `Obj` というフィールドが定義されていました。
 
